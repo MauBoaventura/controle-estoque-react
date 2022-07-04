@@ -1,0 +1,113 @@
+@import './constants';
+
+form {
+  .form-field {
+    font-weight: 400;
+    margin-bottom: 16px !important;
+
+    &.-m-0 {
+      margin-bottom: 0 !important;
+    }
+  }
+
+  .forget-password {
+    text-align: right;
+    margin-top: 8px;
+    margin-bottom: 24px;
+    font-size: 1.4rem;
+    font-weight: 400;
+
+    a {
+      text-decoration: none;
+      color: rgba(#000, 0.6);
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  button.bt-submit {
+    background: $green2 !important;
+    font-size: 1.6rem !important;
+    font-weight: 600;
+    padding: 8px 0 !important;
+    text-transform: capitalize !important;
+  }
+
+  .create-acc-label {
+    margin-top: 24px;
+    text-align: center;
+
+    a {
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    span {
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: rgba(#000, 0.6);
+
+      &.highlight {
+        color: $green2;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+.MuiSlider-root {
+  color: $green2 !important;
+  margin-bottom: 30px;
+
+  .MuiSlider-rail {
+    height: 1px;
+  }
+
+  .MuiSlider-track {
+    height: 3px;
+  }
+
+  .MuiSlider-thumb {
+    width: 16px;
+    height: 16px;
+    margin-top: -7px;
+  }
+
+  .MuiSlider-valueLabel {
+    top: initial;
+    left: 50%;
+    transform: translate(-50%, 100%) !important;
+    margin-top: 13px;
+
+    > span {
+      background-color: transparent;
+      border-radius: 50%;
+      width: initial;
+      height: initial;
+      transform: initial;
+
+      > span {
+        transform: initial;
+        font-size: 11px;
+        line-height: 120%;
+        text-align: center;
+        letter-spacing: 0.1px;
+        font-weight: 500;
+        color: $grey4;
+      }
+    }
+  }
+
+  .use-terms {
+    display: flex;
+    align-items: center;
+  }
+}
