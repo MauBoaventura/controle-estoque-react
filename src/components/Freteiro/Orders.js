@@ -9,7 +9,7 @@ import Title from './Title';
 
 import { client } from "../../services";
 
-// const moment = require('moment')
+const moment = require('moment')
 
 // Generate Order Data
 function createData(id, date, name, shipTo, paymentMethod, amount) {
@@ -60,44 +60,50 @@ export default function Orders() {
   const [pedidos, setPedidos] = useState(rows)
   useEffect(() => {
     async function loadAll() {
-        try {
-            var pedidos = (await client.get("/api/pedido"));
-            // const time = moment(pedidos.data.dataVencimentoPedido).format("YYYY-MM-DD");
-            // setDataVencimento(time);
-          setPedidos(pedidos.data[0]);            
-        } catch (error) {
-            console.error(error)
-        }
+      try {
+        let pedidos = (await client.get("/api/produto"));
+        pedidos = pedidos.data[0]
+        pedidos = pedidos.map((pedido => {
+          return {
+            ...pedido,
+            data_pedido: moment(pedido.data_pedido).format("DD-MM-YYYY")
+          }
+        }))
+
+        setPedidos(pedidos);
+      } catch (error) {
+        console.error(error)
+      }
     }
     loadAll()
-}, [])
+  }, [])
 
   return (
     <React.Fragment>
-      <Title>Últimos Pedidos</Title>
+      <Title>Todos Produtos</Title>
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Data pedido</TableCell>
-            <TableCell>Lote</TableCell>
-            <TableCell>Fornecedor</TableCell>
-            <TableCell>Dolar compra</TableCell>
-            <TableCell>Quantidade solicitada</TableCell>
-            <TableCell align="right">Valor da nota</TableCell>
-          </TableRow>
+            <TableCell>ID</TableCell>
+            <TableCell>Marca</TableCell>
+            <TableCell>Modelo</TableCell>
+            <TableCell>Cor</TableCell>
+            <TableCell>Capacidade</TableCell>
+            <TableCell>RAM</TableCell>
+           </TableRow>
         </TableHead>
         <TableBody>
           {
-          pedidos.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>{row.data_pedido}</TableCell>
-              <TableCell>{row.lote}</TableCell>
-              <TableCell>{row.fornecedor_id}</TableCell>
-              <TableCell>{row.dolar_compra}</TableCell>
-              <TableCell>{row.quantidade_solicitada}</TableCell>
-              <TableCell align="right">{`$${row.total_nota}`}</TableCell>
-            </TableRow>
-          ))}
+            pedidos.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell>{row.id}</TableCell>
+                <TableCell>{row.marca}</TableCell>
+                <TableCell>{row.modelo}</TableCell>
+                <TableCell>{row.cor}</TableCell>
+                <TableCell>{row.capacidade}</TableCell>
+                <TableCell>{row.ram??"-"}</TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
       <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>

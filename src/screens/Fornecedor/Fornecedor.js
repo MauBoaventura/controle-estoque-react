@@ -2,14 +2,14 @@ import React from 'react';
 import { Container } from '@mui/material';
 
 import './styles.scss';
-import Dashboard from '../../components/Dashboard/Dashboar';
+import FornecedorScrean from '../../components/Fornecedor/Fornecedor';
 
-const Home = ()=> (
+const Fornecedor = ()=> (
   <div className='screen login'>
     <Container maxWidth='xl'>
-      <Dashboard/>
+      <FornecedorScrean/>
     </Container>
   </div>
 );
 
-export default Home;
+export default Fornecedor;
