@@ -98,7 +98,7 @@ export default function Orders() {
               <TableRow key={row.id}>
                 <TableCell>{row.data_pedido}</TableCell>
                 <TableCell>{row.lote}</TableCell>
-                <TableCell>{row.fornecedor.nome}</TableCell>
+                <TableCell>{row.fornecedor?.nome?row.fornecedor.nome:row.fornecedor_id}</TableCell>
                 <TableCell>{row.dolar_compra}</TableCell>
                 <TableCell>{row.quantidade_solicitada}</TableCell>
                 <TableCell align="right">{`$${row.total_nota}`}</TableCell>
