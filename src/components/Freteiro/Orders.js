@@ -9,11 +9,9 @@ import Title from './Title';
 
 import { client } from "../../services";
 
-const moment = require('moment')
-
 // Generate Order Data
-function createData(id, date, name, shipTo, paymentMethod, amount) {
-  return { id, date, name, shipTo, paymentMethod, amount };
+function createData(id, date, nome, shipTo, paymentMethod, amount) {
+  return { id, date, nome, shipTo, paymentMethod, amount };
 }
 
 const rows = [
@@ -57,20 +55,18 @@ function preventDefault(event) {
 }
 
 export default function Orders() {
-  const [pedidos, setPedidos] = useState(rows)
+  const [freteiros, setFreteiros] = useState(rows)
   useEffect(() => {
     async function loadAll() {
       try {
-        let pedidos = (await client.get("/api/produto"));
-        pedidos = pedidos.data[0]
-        pedidos = pedidos.map((pedido => {
-          return {
-            ...pedido,
-            data_pedido: moment(pedido.data_pedido).format("DD-MM-YYYY")
-          }
-        }))
+        let freteirosResponse = (await client.get("/api/freteiro"));
 
-        setPedidos(pedidos);
+        if (freteirosResponse.status === 200) {
+          freteirosResponse = freteirosResponse.data
+          
+          setFreteiros(freteirosResponse);
+        }
+
       } catch (error) {
         console.error(error)
       }
@@ -80,28 +76,21 @@ export default function Orders() {
 
   return (
     <React.Fragment>
-      <Title>Todos Produtos</Title>
+      <Title>Todos Freteiros</Title>
       <Table size="small">
         <TableHead>
           <TableRow>
             <TableCell>ID</TableCell>
-            <TableCell>Marca</TableCell>
-            <TableCell>Modelo</TableCell>
-            <TableCell>Cor</TableCell>
-            <TableCell>Capacidade</TableCell>
-            <TableCell>RAM</TableCell>
+            <TableCell>Nome</TableCell>
            </TableRow>
         </TableHead>
         <TableBody>
           {
-            pedidos.map((row) => (
+            freteiros.map((row) => (
               <TableRow key={row.id}>
                 <TableCell>{row.id}</TableCell>
-                <TableCell>{row.marca}</TableCell>
-                <TableCell>{row.modelo}</TableCell>
-                <TableCell>{row.cor}</TableCell>
-                <TableCell>{row.capacidade}</TableCell>
-                <TableCell>{row.ram??"-"}</TableCell>
+                <TableCell>{row.nome}</TableCell>
+
               </TableRow>
             ))}
         </TableBody>

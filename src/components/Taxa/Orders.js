@@ -62,7 +62,7 @@ export default function Orders() {
     async function loadAll() {
       try {
         let pedidos = (await client.get("/api/produto"));
-        pedidos = pedidos.data[0]
+        pedidos = pedidos.data
         pedidos = pedidos.map((pedido => {
           return {
             ...pedido,

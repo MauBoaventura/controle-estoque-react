@@ -64,7 +64,7 @@ export default function Orders() {
             var pedidos = (await client.get("/api/pedido"));
             // const time = moment(pedidos.data.dataVencimentoPedido).format("YYYY-MM-DD");
             // setDataVencimento(time);
-          setPedidos(pedidos.data[0]);            
+          setPedidos(pedidos.data);            
         } catch (error) {
             console.error(error)
         }

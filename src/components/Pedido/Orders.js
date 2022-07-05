@@ -1,55 +1,96 @@
 import React, { useEffect, useState } from 'react';
 import Link from '@mui/material/Link';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
+import { DataGrid } from '@mui/x-data-grid';
+// import Table from '@mui/material/Table';
+// import TableBody from '@mui/material/TableBody';
+// import TableCell from '@mui/material/TableCell';
+// import TableHead from '@mui/material/TableHead';
+// import TableRow from '@mui/material/TableRow';
 import Title from './Title';
 
 import { client } from "../../services";
 
 const moment = require('moment')
 
-// Generate Order Data
-function createData(id, date, name, shipTo, paymentMethod, amount) {
-  return { id, date, name, shipTo, paymentMethod, amount };
-}
-
 const rows = [
-  createData(
-    0,
-    '16 Mar, 2019',
-    'Elvis Presley',
-    'Tupelo, MS',
-    'VISA ⠀•••• 3719',
-    312.44,
-  ),
-  createData(
-    1,
-    '16 Mar, 2019',
-    'Paul McCartney',
-    'London, UK',
-    'VISA ⠀•••• 2574',
-    866.99,
-  ),
-  createData(2, '16 Mar, 2019', 'Tom Scholz', 'Boston, MA', 'MC ⠀•••• 1253', 100.81),
-  createData(
-    3,
-    '16 Mar, 2019',
-    'Michael Jackson',
-    'Gary, IN',
-    'AMEX ⠀•••• 2000',
-    654.39,
-  ),
-  createData(
-    4,
-    '15 Mar, 2019',
-    'Bruce Springsteen',
-    'Long Branch, NJ',
-    'VISA ⠀•••• 5919',
-    212.79,
-  ),
+  {
+    "id": 2,
+    "data_pedido": "2022-06-30T00:00:00.000Z",
+    "lote": 1,
+    "fornecedor_id": 1,
+    "dolar_compra": "1.00",
+    "quantidade_solicitada": 1,
+    "valor_produto": "1.00",
+    "quantidade_recebida": 1,
+    "produto_id": 1,
+    "freteiro_id": 1,
+    "total_nota": 1,
+    "total_recebido": 0,
+    "createdAt": "2022-07-04T05:40:37.000Z",
+    "updatedAt": "2022-07-04T05:40:37.000Z",
+    "deletedAt": null,
+    "fornecedor": {
+        "id": 1,
+        "nome": "Mega"
+    }
+}
+];
+
+const columns = [
+  { field: 'id', headerName: 'ID', width: 70 },
+  { field: 'data_pedido', headerName: 'Data Pedido',type: 'date', width: 130 },
+  {
+    field: 'lote',
+    headerName: 'Lote',
+    type: 'number',
+    width: 90,
+  },
+  {
+    field: 'fornecedor_nome', headerName: 'Fornecedor', width: 130,
+    valueGetter: (params) =>
+      `${params.row.fornecedor.nome || ''}`
+  },
+  {
+    field: 'Produto',
+    headerName: 'Produto',
+    description: 'This column has a value getter and is not sortable.',
+    sortable: false,
+    width: 260,
+    valueGetter: (params) =>
+      `${params.row.produto?.marca || ''} ${params.row.produto?.modelo || ''} ${params.row.produto?.cor || ''} ${params.row.produto?.ram || ''}`,
+  },
+  {
+    field: 'quantidade_solicitada',
+    headerName: 'Quantidade solicitada',
+    description: 'This column has a value getter and is not sortable.',
+    sortable: false,
+    width: 170,
+    valueGetter: (params) =>
+      `${params.row.quantidade_solicitada || ''}`,
+  },
+  {
+    field: 'valor_produto',
+    headerName: 'Valor do produto',
+    width: 170,
+    valueGetter: (params) =>
+      `R$ ${params.row.valor_produto || ''}`,
+  },
+  {
+    field: 'dolar',
+    headerName: 'Dólar',
+    width: 70,
+    valueGetter: (params) =>
+      `$ ${params.row.dolar_compra || ''}`,
+  },
+  {
+    field: 'total_nota',
+    headerName: 'Total em reais',
+    description: 'This column has a value getter and is not sortable.',
+    sortable: false,
+    width: 170,
+    valueGetter: (params) =>
+      `R$ ${parseFloat(params.row.valor_produto*params.row.dolar_compra*params.row.quantidade_solicitada).toFixed( 2 ) || ''}`,
+  },
 ];
 
 function preventDefault(event) {
@@ -62,7 +103,7 @@ export default function Orders() {
     async function loadAll() {
       try {
         let pedidos = (await client.get("/api/pedido"));
-        pedidos = pedidos.data[0]
+        pedidos = pedidos.data
         pedidos = pedidos.map((pedido => {
           return {
             ...pedido,
@@ -81,7 +122,16 @@ export default function Orders() {
   return (
     <React.Fragment>
       <Title>Todos Pedidos</Title>
-      <Table size="small">
+      <div style={{ height: 400, width: '100%' }}>
+      <DataGrid
+        rows={pedidos}
+        columns={columns}
+        pageSize={5}
+        rowsPerPageOptions={[5]}
+        checkboxSelection
+      />
+    </div>
+      {/* <Table size="small">
         <TableHead>
           <TableRow>
             <TableCell>Data pedido</TableCell>
@@ -105,7 +155,7 @@ export default function Orders() {
               </TableRow>
             ))}
         </TableBody>
-      </Table>
+      </Table> */}
       <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>
         See more orders
       </Link>
