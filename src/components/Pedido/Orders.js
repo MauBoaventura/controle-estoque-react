@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Link from '@mui/material/Link';
 import { DataGrid } from '@mui/x-data-grid';
+import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 // import Table from '@mui/material/Table';
 // import TableBody from '@mui/material/TableBody';
 // import TableCell from '@mui/material/TableCell';
@@ -30,28 +33,48 @@ const rows = [
     "updatedAt": "2022-07-04T05:40:37.000Z",
     "deletedAt": null,
     "fornecedor": {
-        "id": 1,
-        "nome": "Mega"
+      "id": 1,
+      "nome": "Mega"
     }
-}
+  }
 ];
-
+const verificaQuantidadeRecebida = (params) => {
+  if (params.row.quantidade_recebida === 0)
+    return 'nenhum'
+  else if (params.row.quantidade_recebida === params.row.quantidade_solicitada)
+    return 'recebido'
+  else return 'faltando'
+}
 const columns = [
-  { field: 'id', headerName: 'ID', width: 70 },
-  { field: 'data_pedido', headerName: 'Data Pedido',type: 'date', width: 130 },
+  {
+    field: 'id',
+    cellClassName: verificaQuantidadeRecebida,
+    headerName: 'ID',
+    width: 70,
+  },
+  {
+    field: 'data_pedido',
+    cellClassName: verificaQuantidadeRecebida,
+    headerName: 'Data Pedido',
+    type: 'date',
+    width: 130,
+  },
   {
     field: 'lote',
+    cellClassName: verificaQuantidadeRecebida,
     headerName: 'Lote',
     type: 'number',
     width: 90,
   },
   {
     field: 'fornecedor_nome', headerName: 'Fornecedor', width: 130,
+    cellClassName: verificaQuantidadeRecebida,
     valueGetter: (params) =>
       `${params.row.fornecedor.nome || ''}`
   },
   {
     field: 'Produto',
+    cellClassName: verificaQuantidadeRecebida,
     headerName: 'Produto',
     description: 'This column has a value getter and is not sortable.',
     sortable: false,
@@ -61,6 +84,7 @@ const columns = [
   },
   {
     field: 'quantidade_solicitada',
+    cellClassName: verificaQuantidadeRecebida,
     headerName: 'Quantidade solicitada',
     description: 'This column has a value getter and is not sortable.',
     sortable: false,
@@ -70,6 +94,7 @@ const columns = [
   },
   {
     field: 'valor_produto',
+    cellClassName: verificaQuantidadeRecebida,
     headerName: 'Valor do produto',
     width: 170,
     valueGetter: (params) =>
@@ -77,6 +102,7 @@ const columns = [
   },
   {
     field: 'dolar',
+    cellClassName: verificaQuantidadeRecebida,
     headerName: 'Dólar',
     width: 70,
     valueGetter: (params) =>
@@ -84,12 +110,13 @@ const columns = [
   },
   {
     field: 'total_nota',
+    cellClassName: verificaQuantidadeRecebida,
     headerName: 'Total em reais',
     description: 'This column has a value getter and is not sortable.',
     sortable: false,
     width: 170,
     valueGetter: (params) =>
-      `R$ ${parseFloat(params.row.valor_produto*params.row.dolar_compra*params.row.quantidade_solicitada).toFixed( 2 ) || ''}`,
+      `R$ ${parseFloat(params.row.valor_produto * params.row.dolar_compra * params.row.quantidade_solicitada).toFixed(2) || ''}`,
   },
 ];
 
@@ -119,18 +146,53 @@ export default function Orders() {
     loadAll()
   }, [])
 
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <React.Fragment>
-      <Title>Todos Pedidos</Title>
+      <div>
+        <Button
+          id="basic-button"
+          aria-controls={open ? 'basic-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          onClick={handleClick}
+          size='large'
+        >
+          Todos Pedidos
+        </Button>
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          MenuListProps={{
+            'aria-labelledby': 'basic-button',
+          }}
+        >
+          <MenuItem onClick={handleClose}>Novo</MenuItem>
+          <MenuItem onClick={handleClose}>Editar</MenuItem>
+          <MenuItem onClick={handleClose}>Deletar</MenuItem>
+        </Menu>
+      </div>
+      <Title>
+      </Title>
       <div style={{ height: 400, width: '100%' }}>
-      <DataGrid
-        rows={pedidos}
-        columns={columns}
-        pageSize={5}
-        rowsPerPageOptions={[5]}
-        checkboxSelection
-      />
-    </div>
+        <DataGrid
+          rows={pedidos}
+          columns={columns}
+          pageSize={5}
+          rowsPerPageOptions={[5]}
+          checkboxSelection
+        />
+      </div>
       {/* <Table size="small">
         <TableHead>
           <TableRow>
