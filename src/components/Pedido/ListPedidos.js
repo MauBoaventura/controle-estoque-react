@@ -1,20 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import Link from '@mui/material/Link';
 import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-// import Table from '@mui/material/Table';
-// import TableBody from '@mui/material/TableBody';
-// import TableCell from '@mui/material/TableCell';
-// import TableHead from '@mui/material/TableHead';
-// import TableRow from '@mui/material/TableRow';
+
 import Title from './Title';
 
 import { client } from "../../services";
 
 const moment = require('moment')
-
+const isActiveColor = false
 const rows = [
   {
     "id": 2,
@@ -39,11 +36,14 @@ const rows = [
   }
 ];
 const verificaQuantidadeRecebida = (params) => {
-  if (params.row.quantidade_recebida === 0)
-    return 'nenhum'
-  else if (params.row.quantidade_recebida === params.row.quantidade_solicitada)
+  if(isActiveColor){
+    if (params.row.quantidade_recebida === params.row.quantidade_solicitada)
     return 'recebido'
-  else return 'faltando'
+    else if (params.row.quantidade_recebida > 0)
+    return 'faltando'
+    else 
+    return 'nenhum'
+  }
 }
 const columns = [
   {
@@ -70,7 +70,7 @@ const columns = [
     field: 'fornecedor_nome', headerName: 'Fornecedor', width: 130,
     cellClassName: verificaQuantidadeRecebida,
     valueGetter: (params) =>
-      `${params.row.fornecedor.nome || ''}`
+      `${params.row.fornecedor?.nome || ''}`
   },
   {
     field: 'Produto',
@@ -91,6 +91,16 @@ const columns = [
     width: 170,
     valueGetter: (params) =>
       `${params.row.quantidade_solicitada || ''}`,
+  },
+  {
+    field: 'quantidade_recebida',
+    cellClassName: verificaQuantidadeRecebida,
+    headerName: 'Quantidade Recebida',
+    description: 'This column has a value getter and is not sortable.',
+    sortable: false,
+    width: 170,
+    valueGetter: (params) =>
+      `${params.row.quantidade_recebida || '0'}`,
   },
   {
     field: 'valor_produto',
@@ -124,8 +134,10 @@ function preventDefault(event) {
   event.preventDefault();
 }
 
-export default function Orders() {
+export default function ListPedidos() {
+  const history = useNavigate();
   const [pedidos, setPedidos] = useState(rows)
+
   useEffect(() => {
     async function loadAll() {
       try {
@@ -153,6 +165,18 @@ export default function Orders() {
   };
   const handleClose = () => {
     setAnchorEl(null);
+    // history("/");
+  };
+
+  const handleCloseAndNew = () => {
+    history("/pedidos/criar");
+
+  };
+  const handleCloseAndEdit = () => {
+
+  };
+  const handleCloseAndDelete = () => {
+
   };
 
   return (
@@ -177,9 +201,9 @@ export default function Orders() {
             'aria-labelledby': 'basic-button',
           }}
         >
-          <MenuItem onClick={handleClose}>Novo</MenuItem>
-          <MenuItem onClick={handleClose}>Editar</MenuItem>
-          <MenuItem onClick={handleClose}>Deletar</MenuItem>
+          <MenuItem onClick={handleCloseAndNew}>Novo</MenuItem>
+          <MenuItem onClick={handleCloseAndEdit}>Editar</MenuItem>
+          <MenuItem onClick={handleCloseAndDelete}>Deletar</MenuItem>
         </Menu>
       </div>
       <Title>
@@ -188,8 +212,8 @@ export default function Orders() {
         <DataGrid
           rows={pedidos}
           columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5]}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
           checkboxSelection
         />
       </div>
@@ -219,7 +243,7 @@ export default function Orders() {
         </TableBody>
       </Table> */}
       <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>
-        See more orders
+        See more ListPedidos
       </Link>
     </React.Fragment>
   );

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -19,8 +18,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { mainListItems, secondaryListItems } from './listItems';
-import ListPedidos from './ListPedidos';
-import EditPedidos from './EditPedidos';
+import CreatePedidos from './CreatePedidos';
 
 const drawerWidth = 240;
 
@@ -70,8 +68,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const mdTheme = createTheme();
 
-function PedidoContent(props) {
-  const { id } = useParams();
+function PedidoContent() {
   const [open, setOpen] = useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -150,11 +147,10 @@ function PedidoContent(props) {
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
-              {/* Recent ListPedidos */}
+              {/* Recent CreatePedidos */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  {id ? <EditPedidos id={id}/> : <ListPedidos />}
-                  
+                  <CreatePedidos></CreatePedidos>
                 </Paper>
               </Grid>
             </Grid>
@@ -165,6 +161,6 @@ function PedidoContent(props) {
   );
 }
 
-export default function Pedido(props) {
-  return <PedidoContent {...props}/>;
+export default function PedidoCriar() {
+  return <PedidoContent/>;
 }
