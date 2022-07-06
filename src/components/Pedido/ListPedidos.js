@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import Link from '@mui/material/Link';
 import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
@@ -9,6 +8,9 @@ import MenuItem from '@mui/material/MenuItem';
 import Title from './Title';
 
 import { client } from "../../services";
+import { CircularProgress } from '@mui/material';
+
+import './styles.scss';
 
 const moment = require('moment')
 const isActiveColor = false
@@ -36,13 +38,13 @@ const rows = [
   }
 ];
 const verificaQuantidadeRecebida = (params) => {
-  if(isActiveColor){
+  if (isActiveColor) {
     if (params.row.quantidade_recebida === params.row.quantidade_solicitada)
-    return 'recebido'
+      return 'recebido'
     else if (params.row.quantidade_recebida > 0)
-    return 'faltando'
-    else 
-    return 'nenhum'
+      return 'faltando'
+    else
+      return 'nenhum'
   }
 }
 const columns = [
@@ -130,13 +132,11 @@ const columns = [
   },
 ];
 
-function preventDefault(event) {
-  event.preventDefault();
-}
 
 export default function ListPedidos() {
   const history = useNavigate();
   const [pedidos, setPedidos] = useState(rows)
+  const [requesting, setRequesting] = useState(true)
 
   useEffect(() => {
     async function loadAll() {
@@ -153,6 +153,9 @@ export default function ListPedidos() {
         setPedidos(pedidos);
       } catch (error) {
         console.error(error)
+      }
+      finally {
+        setRequesting(false)
       }
     }
     loadAll()
@@ -208,43 +211,19 @@ export default function ListPedidos() {
       </div>
       <Title>
       </Title>
-      <div style={{ height: 400, width: '100%' }}>
-        <DataGrid
-          rows={pedidos}
-          columns={columns}
-          pageSize={10}
-          rowsPerPageOptions={[10]}
-          checkboxSelection
-        />
+      <div className='content'>
+        {requesting ? <CircularProgress /> :
+          <div style={{ height: 400, width: '100%' }}>
+            <DataGrid
+              rows={pedidos}
+              columns={columns}
+              pageSize={10}
+              rowsPerPageOptions={[10]}
+              checkboxSelection
+            />
+          </div>
+        }
       </div>
-      {/* <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>Data pedido</TableCell>
-            <TableCell>Lote</TableCell>
-            <TableCell>Fornecedor</TableCell>
-            <TableCell>Dolar compra</TableCell>
-            <TableCell>Quantidade solicitada</TableCell>
-            <TableCell align="right">Valor da nota</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {
-            pedidos.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>{row.data_pedido}</TableCell>
-                <TableCell>{row.lote}</TableCell>
-                <TableCell>{row.fornecedor?.nome?row.fornecedor.nome:row.fornecedor_id}</TableCell>
-                <TableCell>{row.dolar_compra}</TableCell>
-                <TableCell>{row.quantidade_solicitada}</TableCell>
-                <TableCell align="right">{`$${row.total_nota}`}</TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
-      </Table> */}
-      <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>
-        See more ListPedidos
-      </Link>
     </React.Fragment>
   );
 }
