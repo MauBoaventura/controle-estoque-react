@@ -7,6 +7,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PeopleIcon from '@mui/icons-material/People';
 import BarChartIcon from '@mui/icons-material/BarChart';
+import SettingsCellIcon from '@mui/icons-material/SettingsCell';
 import LayersIcon from '@mui/icons-material/Layers';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 
@@ -41,6 +42,12 @@ export const mainListItems = (
         <BarChartIcon />
       </ListItemIcon>
       <ListItemText primary="Taxas" />
+    </ListItemButton>
+    <ListItemButton href='/recebidos'>
+      <ListItemIcon>
+        <SettingsCellIcon/>
+      </ListItemIcon>
+      <ListItemText primary="Produtos Recebidos" />
     </ListItemButton>
   </React.Fragment>
 );
