@@ -1,3 +1,4 @@
+/*eslint-disable */
 import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
@@ -7,7 +8,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { useNavigate } from "react-router-dom";
 import { parseISO } from 'date-fns'; 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-// import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 
 import { client } from "../../services";
@@ -30,7 +31,7 @@ function CreatePedidos() {
   const [produtos, setProdutos] = useState([])
 
   const [requesting, setRequesting] = useState(false);
-  const [initialValues] = useState({
+  const [initialValues, setInitialValues] = useState({
     "data_pedido": new Date().toJSON().slice(0, 10),
     // "lote": 1,
     // "produto_id": 1,
@@ -47,12 +48,12 @@ function CreatePedidos() {
     console.log(formValues);
     try {
       setRequesting(true)
-      if (false) {
+      if (true) {
         let pedidos = (await client.post("/api/pedido/", formValues));
 
         if (pedidos.status === 201) {
-          console.log('deu ceerto')
-          alert("tudo certo gustavo")
+          toast("OK")
+          history("/pedidos");
         }
         else {
           console.error('n deu ceerto')
@@ -78,6 +79,15 @@ function CreatePedidos() {
 
   useEffect(() => {
     async function loadAll() {
+      //Carrega lista de freteiro
+      try {
+        let lastpedido = (await client.get("/api/lastpedido"));
+        lastpedido = lastpedido.data
+        setInitialValues({...initialValues,'lote':lastpedido+1});
+      } catch (error) {
+        console.error(error)
+      }
+
       //Carrega lista de freteiro
       try {
         let freteiros = (await client.get("/api/freteiro/"));
@@ -117,9 +127,21 @@ function CreatePedidos() {
     setAnchorEl(null);
   };
 
+  const handleCloseAndNew = () => {
+    history("/pedidos/criar");
+
+  };
+  const handleCloseAndEdit = () => {
+    history("/");
+    
+  };
+  const handleCloseAndDelete = () => {
+    history("/pedidos");
+  };
+
   useEffect(() => {
     formik.validateForm();
-  }, [formik]);
+  }, []);
   return (
     <React.Fragment>
       <div>
@@ -142,9 +164,9 @@ function CreatePedidos() {
             'aria-labelledby': 'basic-button',
           }}
         >
-          <MenuItem onClick={handleClose}>Novo</MenuItem>
-          <MenuItem onClick={handleClose}>Editar</MenuItem>
-          <MenuItem onClick={handleClose}>Deletar</MenuItem>
+          <MenuItem onClick={handleCloseAndNew}>Novo</MenuItem>
+          <MenuItem onClick={handleCloseAndEdit}>Editar</MenuItem>
+          <MenuItem onClick={handleCloseAndDelete}>Deletar</MenuItem>
         </Menu>
       </div>
       <form className='form' onSubmit={formik.handleSubmit}>
@@ -175,42 +197,6 @@ function CreatePedidos() {
               />
             )}
           />
-          {/* <DatePicker
-            id='data_pedido'
-            name='data_pedido'
-            fullWidth
-            label="Data do pedido"
-            variant='outlined'
-            margin='dense'
-            value={formik.values.data_pedido}
-            sx={{ width: 200 }}
-            inputFormat="dd/MM/yyyy"
-            onChange={(e, value) => {
-              console.log(e);
-              console.log(value);
-              formik.setFieldValue(
-                "data_pedido",
-                value !== null ? value : initialValues.data_pedido
-              );
-            }}
-            renderInput={(params) =>
-              <TextField {...params}
-                margin='dense'
-                label="data_pedido"
-                variant='outlined'
-                fullWidth
-                autoComplete='on'
-                className='form-field'
-                onChange={(e, value) => formik.setFieldValue("data_pedido", value)}
-                value={formik.values.data_pedido}
-                error={!!formik.errors.data_pedido && formik.touched.data_pedido}
-                helperText={formik.touched.data_pedido && formik.errors.data_pedido}
-                disabled={requesting}
-                sx={{ width: 200 }}
-              />
-            }
-          /> */}
-
           <TextField
             style={{ marginLeft: '10px' }}
             id='lote'

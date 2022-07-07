@@ -176,10 +176,11 @@ export default function ListPedidos() {
 
   };
   const handleCloseAndEdit = () => {
-
+    history("/");
+    
   };
   const handleCloseAndDelete = () => {
-
+    history("/pedidos");
   };
 
   return (
