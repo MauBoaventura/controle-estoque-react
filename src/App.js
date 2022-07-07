@@ -1,12 +1,13 @@
 import React from 'react';
 import Router from './components/Router/Router';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+
 
 function App() {
   return (
     <div className="App">
-      <LocalizationProvider dateAdapter={AdapterMoment}>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Router />
       </LocalizationProvider>
     </div>

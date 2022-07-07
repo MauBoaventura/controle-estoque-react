@@ -16,7 +16,7 @@ const moment = require('moment')
 
 
 export default function EditPedidos({ id }) {
-  const [pedido, setPedido] = useState([])
+  const [, setPedido] = useState([])
   const [freteiros, setFreteiros] = useState([])
   const [fornecedores, setFornecedores] = useState([])
   const [produtos, setProdutos] = useState([])

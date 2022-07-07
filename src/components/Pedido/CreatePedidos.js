@@ -5,9 +5,9 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useNavigate } from "react-router-dom";
-
+import { parseISO } from 'date-fns'; 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 
 
 import { client } from "../../services";
@@ -17,16 +17,14 @@ import * as Yup from 'yup';
 
 import {
   REQUIRED_FIELD,
-  SYSTEM_INSTABILITY,
 } from '../../constants/Messages';
 
-
-
+const moment = require('moment')
 
 export default
-  function CreatePedidos() {
-    const history = useNavigate();
-  const [pedido, setPedido] = useState([])
+function CreatePedidos() {
+  const history = useNavigate();
+  // const [pedido, setPedido] = useState([])
   const [freteiros, setFreteiros] = useState([])
   const [fornecedores, setFornecedores] = useState([])
   const [produtos, setProdutos] = useState([])
@@ -48,61 +46,27 @@ export default
     console.log('formValues');
     console.log(formValues);
     try {
-      let pedidos = (await client.post("/api/pedido/",formValues));
-      if(pedidos.status===201){
-        console.log('deu ceerto')
-       alert("tudo certo gustavo")
-      }
-      else{
-        console.error('n deu ceerto')
-        console.error(pedidos)
-    history("/pedidos");
+      setRequesting(true)
+      if (false) {
+        let pedidos = (await client.post("/api/pedido/", formValues));
 
+        if (pedidos.status === 201) {
+          console.log('deu ceerto')
+          alert("tudo certo gustavo")
+        }
+        else {
+          console.error('n deu ceerto')
+          console.error(pedidos)
+          history("/pedidos");
+
+        }
       }
     } catch (error) {
       console.error(error)
     }
-    // try {
-    //   setRequesting(true);
-
-    //   const response = await flowResult(
-    //     store.authStore.authenticate(formValues)
-    //   );
-
-    //   const { error } = response;
-
-    //   if (error) {
-    //     const { status } = error;
-
-    //     switch (status) {
-    //       case 401: {
-    //         toast.error(
-    //           <Toast
-    //             type='error'
-    //             title='Login'
-    //             text={`INVALID_EMAIL_OR_PASSWORD`}
-    //           />
-    //         );
-    //         break;
-    //       }
-
-    //       default: {
-    //         toast.error(
-    //           <Toast type='error' title='Login' text={SYSTEM_INSTABILITY} />
-    //         );
-    //         break;
-    //       }
-    //     }
-    //   }
-
-    //   if (!error) history.push('/campanhas');
-    // } catch (error) {
-    //   toast.error(
-    //     <Toast type='error' title='Login' text={SYSTEM_INSTABILITY} />
-    //   );
-    // } finally {
-    //   setRequesting(false);
-    // }
+    finally {
+      setRequesting(false)
+    }
   };
 
   const formik = useFormik({
@@ -155,8 +119,7 @@ export default
 
   useEffect(() => {
     formik.validateForm();
-  }, []);
-  const [value, setValue] = useState(new Date());
+  }, [formik]);
   return (
     <React.Fragment>
       <div>
@@ -189,18 +152,67 @@ export default
           <DatePicker
             id='data_pedido'
             name='data_pedido'
+            label="Data do pedido"
+            onChange={(value) => {
+              console.log(value)
+              formik.setFieldValue("data_pedido", moment(value).format("YYYY-MM-DD"), true)}}
+            value={parseISO(moment(formik.values.data_pedido).format("YYYY-MM-DD"))}
+            inputFormat="dd/MM/yyyy"
             fullWidth
-            label="Basic example"
+            renderInput={(params) => (
+              <TextField
+                variant='outlined'
+                fullWidth
+                autoComplete='on'
+                className='form-field'
+                error={Boolean(formik.touched.data_pedido && formik.errors.data_pedido)}
+                helperText={formik.touched.data_pedido && formik.errors.data_pedido}
+                label="Data Pedido"
+                margin="dense"
+                name="data_pedido"
+                sx={{ width: 200 }}
+                {...params}
+              />
+            )}
+          />
+          {/* <DatePicker
+            id='data_pedido'
+            name='data_pedido'
+            fullWidth
+            label="Data do pedido"
             variant='outlined'
             margin='dense'
             value={formik.values.data_pedido}
             sx={{ width: 200 }}
-            inputFormat="DD/MM/yyyy"
-            onChange={formik.handleChange}
-            renderInput={(params) => <TextField {...params} />}
-          />
+            inputFormat="dd/MM/yyyy"
+            onChange={(e, value) => {
+              console.log(e);
+              console.log(value);
+              formik.setFieldValue(
+                "data_pedido",
+                value !== null ? value : initialValues.data_pedido
+              );
+            }}
+            renderInput={(params) =>
+              <TextField {...params}
+                margin='dense'
+                label="data_pedido"
+                variant='outlined'
+                fullWidth
+                autoComplete='on'
+                className='form-field'
+                onChange={(e, value) => formik.setFieldValue("data_pedido", value)}
+                value={formik.values.data_pedido}
+                error={!!formik.errors.data_pedido && formik.touched.data_pedido}
+                helperText={formik.touched.data_pedido && formik.errors.data_pedido}
+                disabled={requesting}
+                sx={{ width: 200 }}
+              />
+            }
+          /> */}
 
           <TextField
+            style={{ marginLeft: '10px' }}
             id='lote'
             name='lote'
             label="Lote"
@@ -278,6 +290,7 @@ export default
         </div>
         <div style={{ display: 'flex' }}>
           <Autocomplete
+            style={{ marginRight: '10px' }}
             disablePortal
             id='produto_id'
             name='produto_id'
