@@ -1,0 +1,76 @@
+@import '../../scss/colors';
+
+.Toastify__toast {
+  background-color: $gray3 !important;
+
+  &-container {
+    width: 480px !important;
+  }
+}
+
+.toast {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  &::before {
+    content: '';
+    width: 6px;
+    border-radius: 3px;
+    display: flex;
+    z-index: 1;
+    background-color: $info;
+    position: absolute;
+    left: -6px;
+    top: -2px;
+    bottom: -2px;
+  }
+
+  &.warning {
+    &::before {
+      background-color: $warning;
+    }
+  }
+
+  &.error {
+    &::before {
+      background-color: $error;
+    }
+  }
+
+  &.success {
+    &::before {
+      background-color: $success;
+    }
+  }
+
+  &.info {
+    &::before {
+      background-color: $info;
+    }
+  }
+
+  &__icon {
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__title,
+  &__text {
+    font-family: Lexend;
+    color: $dark;
+  }
+
+  &__title {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    margin-bottom: 6px;
+  }
+
+  &__text {
+    font-size: 13px;
+  }
+}

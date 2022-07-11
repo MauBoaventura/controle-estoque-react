@@ -2,12 +2,17 @@
 import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
+import InputAdornment from '@mui/material/InputAdornment';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useNavigate } from "react-router-dom";
-import { parseISO } from 'date-fns'; 
+import { parseISO } from 'date-fns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import Toast from '../Toast/Toast';
 import { toast } from 'react-toastify';
 
 
@@ -17,18 +22,21 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 import {
+  TICKET_CREATED,
+  TICKET_ERROR,
   REQUIRED_FIELD,
 } from '../../constants/Messages';
 
 const moment = require('moment')
 
 export default
-function CreatePedidos() {
+  function CreatePedidos() {
   const history = useNavigate();
   // const [pedido, setPedido] = useState([])
   const [freteiros, setFreteiros] = useState([])
   const [fornecedores, setFornecedores] = useState([])
   const [produtos, setProdutos] = useState([])
+  const [taxas, setTaxas] = useState([])
 
   const [requesting, setRequesting] = useState(false);
   const [initialValues, setInitialValues] = useState({
@@ -36,7 +44,7 @@ function CreatePedidos() {
     // "lote": 1,
     // "produto_id": 1,
     // "total_recebido": 0,
-    // "fornecedor_id": 1,
+    "taxa": 0,
   });
 
   const validationSchema = Yup.object().shape({
@@ -44,22 +52,31 @@ function CreatePedidos() {
   });
 
   const onSubmit = async (formValues) => {
-    console.log('formValues');
-    console.log(formValues);
     try {
       setRequesting(true)
       if (true) {
+        delete formValues['taxa']
         let pedidos = (await client.post("/api/pedido/", formValues));
 
         if (pedidos.status === 201) {
-          toast("OK")
+          toast(
+            <Toast
+              type='success'
+              title='Pedido'
+              text={TICKET_CREATED}
+            />
+          );
           history("/pedidos");
         }
         else {
-          console.error('n deu ceerto')
-          console.error(pedidos)
+          toast.error(
+            <Toast
+              type='error'
+              title='Pedido'
+              text={TICKET_ERROR}
+            />
+          );
           history("/pedidos");
-
         }
       }
     } catch (error) {
@@ -83,7 +100,7 @@ function CreatePedidos() {
       try {
         let lastpedido = (await client.get("/api/lastpedido"));
         lastpedido = lastpedido.data
-        setInitialValues({...initialValues,'lote':lastpedido+1});
+        setInitialValues({ ...initialValues, 'lote': lastpedido + 1 });
       } catch (error) {
         console.error(error)
       }
@@ -114,9 +131,41 @@ function CreatePedidos() {
       } catch (error) {
         console.error(error)
       }
+
+      //Carrega taxas de produtos
+      try {
+        let taxas = (await client.get("/api/taxa/"));
+        // taxas = taxas.data.map((item) => ({ label: `${item.marca || ''} ${item.modelo || ''} ${item.cor || ''} ${item.ram || ''}`, id: item.id }))
+        setTaxas(taxas);
+      } catch (error) {
+        console.error(error)
+      }
     }
     loadAll()
   }, [])
+
+  useEffect(() => {
+    async function load() {
+      if (formik.values.produto_id && formik.values.freteiro_id) {
+        try {
+          let taxa = (await client.get(`/api/taxa/?freteiro_id=${formik.values.freteiro_id}&produto_id=${formik.values.produto_id}`));
+          if (taxa.status === 200) {
+            taxa = taxa.data.taxa
+            console.log(taxa * 100)
+            formik.setFieldValue("taxa", (taxa * 100).toFixed(2) ?? 5, true)
+          } else {
+            formik.setFieldValue("taxa", (taxa * 100).toFixed(2) ?? 5, true)
+          }
+        } catch (error) {
+          console.error(error)
+        }
+      } else {
+        formik.setFieldValue("taxa", 0, true)
+      }
+    }
+    load()
+  }, [formik.values.produto_id, formik.values.freteiro_id])
+
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -133,7 +182,7 @@ function CreatePedidos() {
   };
   const handleCloseAndEdit = () => {
     history("/");
-    
+
   };
   const handleCloseAndDelete = () => {
     history("/pedidos");
@@ -177,7 +226,8 @@ function CreatePedidos() {
             label="Data do pedido"
             onChange={(value) => {
               console.log(value)
-              formik.setFieldValue("data_pedido", moment(value).format("YYYY-MM-DD"), true)}}
+              formik.setFieldValue("data_pedido", moment(value).format("YYYY-MM-DD"), true)
+            }}
             value={parseISO(moment(formik.values.data_pedido).format("YYYY-MM-DD"))}
             inputFormat="dd/MM/yyyy"
             fullWidth
@@ -216,6 +266,9 @@ function CreatePedidos() {
             sx={{ width: 200 }}
             InputLabelProps={{
               shrink: true,
+            }}
+            InputProps={{
+              inputProps: { min: 0 }
             }}
           />
 
@@ -376,7 +429,32 @@ function CreatePedidos() {
             InputLabelProps={{
               shrink: true,
             }}
+            InputProps={{
+              inputProps: { min: 0 }
+            }}
           />
+          <FormControl sx={{ m: 1, width: '20ch' }} variant="outlined" >
+            <InputLabel htmlFor="outlined-adornment-taxa">Taxa</InputLabel>
+            <OutlinedInput
+              style={{ marginRight: '10px' }}
+              id='taxa'
+              name='taxa'
+              label="Taxa"
+              variant='outlined'
+              fullWidth
+              autoComplete='on'
+              className='form-field'
+              onChange={formik.handleChange}
+              value={formik.values.taxa}
+              error={!!formik.errors.taxa && formik.touched.taxa}
+              helpertext={formik.touched.taxa && formik.errors.taxa}
+              endAdornment={<InputAdornment position="start">%</InputAdornment>}
+              disabled={true}
+              type="number"
+              margin='dense'
+              sx={{ width: 100 }}
+            />
+          </FormControl>
         </div>
         <Button variant="contained" color="success" type='submit'>
           Salvar

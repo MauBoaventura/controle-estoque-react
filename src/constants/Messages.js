@@ -37,3 +37,8 @@ export const INVITE_ERROR =
   'O convite não pode ser enviado ao email do influenciador.';
 export const TOPICS_ERROR = 'Erro ao listar os tópicos.';
 export const INFLUENCER_NOT_EXISTS = 'Influenciador não existe.';
+
+export const TICKET_CREATED = 'Pedido cadastrado com sucesso.';
+export const TICKET_ERROR = 'Erro ao cadastrar pedido.';
+
+

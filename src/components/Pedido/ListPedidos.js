@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid ,GridActionsCellItem} from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+
+import DeleteIcon from '@mui/icons-material/Delete';
+import SecurityIcon from '@mui/icons-material/Security';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 
 import Title from './Title';
 
@@ -130,6 +134,30 @@ const columns = [
     valueGetter: (params) =>
       `R$ ${parseFloat(params.row.valor_produto * params.row.dolar_compra * params.row.quantidade_solicitada).toFixed(2) || ''}`,
   },
+  {
+    field: 'actions',
+    type: 'actions',
+    width: 80,
+    getActions: (params) => [
+      <GridActionsCellItem
+        icon={<DeleteIcon />}
+        label="Delete"
+        onClick={()=>{}}
+      />,
+      <GridActionsCellItem
+        icon={<SecurityIcon />}
+        label="Toggle Admin"
+        onClick={()=>{}}
+        showInMenu
+      />,
+      <GridActionsCellItem
+        icon={<FileCopyIcon />}
+        label="Duplicate User"
+        onClick={()=>{}}
+        showInMenu
+      />,
+    ],
+  },
 ];
 
 
@@ -146,10 +174,9 @@ export default function ListPedidos() {
         pedidos = pedidos.map((pedido => {
           return {
             ...pedido,
-            data_pedido: moment(pedido.data_pedido).format("DD-MM-YYYY")
+            data_pedido: moment(pedido.data_pedido.slice(0, 10)).format("DD-MM-YYYY")
           }
         }))
-
         setPedidos(pedidos);
       } catch (error) {
         console.error(error)
@@ -170,7 +197,6 @@ export default function ListPedidos() {
     setAnchorEl(null);
     // history("/");
   };
-
   const handleCloseAndNew = () => {
     history("/pedidos/criar");
 
@@ -220,7 +246,6 @@ export default function ListPedidos() {
               columns={columns}
               pageSize={10}
               rowsPerPageOptions={[10]}
-              checkboxSelection
             />
           </div>
         }
