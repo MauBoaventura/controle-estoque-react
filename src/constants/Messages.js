@@ -40,5 +40,6 @@ export const INFLUENCER_NOT_EXISTS = 'Influenciador não existe.';
 
 export const TICKET_CREATED = 'Pedido cadastrado com sucesso.';
 export const TICKET_ERROR = 'Erro ao cadastrar pedido.';
+export const TICKET_DELETED = 'Pedido apagado com sucesso.';
 
 

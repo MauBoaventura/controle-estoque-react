@@ -32,7 +32,6 @@ const moment = require('moment')
 export default
   function CreatePedidos() {
   const history = useNavigate();
-  // const [pedido, setPedido] = useState([])
   const [freteiros, setFreteiros] = useState([])
   const [fornecedores, setFornecedores] = useState([])
   const [produtos, setProdutos] = useState([])
@@ -41,9 +40,6 @@ export default
   const [requesting, setRequesting] = useState(false);
   const [initialValues, setInitialValues] = useState({
     "data_pedido": new Date().toJSON().slice(0, 10),
-    // "lote": 1,
-    // "produto_id": 1,
-    // "total_recebido": 0,
     "taxa": 0,
   });
 
@@ -219,7 +215,7 @@ export default
         </Menu>
       </div>
       <form className='form' onSubmit={formik.handleSubmit}>
-        <div style={{ display: 'flex' }}>
+        <div className='form-row'>
           <DatePicker
             id='data_pedido'
             name='data_pedido'
@@ -248,14 +244,13 @@ export default
             )}
           />
           <TextField
-            style={{ marginLeft: '10px' }}
             id='lote'
             name='lote'
             label="Lote"
             variant='outlined'
             fullWidth
             autoComplete='on'
-            className='form-field'
+            className='margin-l'
             onChange={formik.handleChange}
             value={formik.values.lote}
             error={!!formik.errors.lote && formik.touched.lote}
@@ -273,7 +268,7 @@ export default
           />
 
         </div>
-        <div style={{ display: 'flex' }}>
+        <div className='form-row'>
           <Autocomplete
             disablePortal
             id='fornecedor_id'
@@ -304,8 +299,7 @@ export default
               />}
           />
         </div>
-        <div style={{ display: 'flex', marginTop: '20px' }}>
-
+        <div className='form-row'>
           <TextField
             id='dolar_compra'
             name='dolar_compra'
@@ -327,7 +321,7 @@ export default
             }}
           />
         </div>
-        <div style={{ display: 'flex' }}>
+        <div className='form-row'>
           <Autocomplete
             style={{ marginRight: '10px' }}
             disablePortal
