@@ -10,25 +10,11 @@ import Fornecedor from '../../screens/Fornecedor/Fornecedor';
 import Freteiro from '../../screens/Freteiro/Freteiro';
 import Taxa from '../../screens/Taxa/Taxa';
 
-// import { useStore } from '../../hooks';
-
-// import { Header } from '../styleguide';
-// import Invite from '../../screens/Invite/Invite';
-// import InstagramCallback from '../../screens/InstagramCallback';
-
 const Routerr = () => {
-  // const store = useStore();
-
-  // if (store.authStore.fetchingUser) return null;
 
   return (
     <BrowserRouter>
       <div className='App'>
-        {/* <ul>
-          <li> <Link to='/'>Home</Link> </li>
-          <li> <Link to='/about'>Pedido</Link> </li>
-          <li> <Link to='/user/meunome'>Fornecedor</Link> </li>
-        </ul> */}
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/produtos' element={<Produto />} />

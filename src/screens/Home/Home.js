@@ -4,9 +4,8 @@ import React from 'react';
 import './styles.scss';
 import Dashboard from '../../components/Dashboard/Dashboar';
 
-const Home = ()=> (
-  
-      <Dashboard/>
+const Home = () => (
+      <Dashboard />
 );
 
 export default Home;

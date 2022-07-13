@@ -170,6 +170,24 @@ export default function ListPedidos() {
         `R$ ${parseFloat(params.row.valor_produto * params.row.dolar_compra * params.row.quantidade_solicitada).toFixed(2) || ''}`,
     },
     {
+      field: 'comissao',
+      cellClassName: verificaQuantidadeRecebida,
+      headerName: 'Comissão',
+      sortable: false,
+      width: 170,
+      valueGetter: (params) =>
+        `R$ ${parseFloat(params.row.valor_produto * params.row.dolar_compra * params.row.quantidade_solicitada * (params.row?.taxa_transporte_produto?.taxa??0.05)).toFixed(2) || ''}`,
+    },
+    {
+      field: 'total_frete',
+      cellClassName: verificaQuantidadeRecebida,
+      headerName: 'Frete',
+      sortable: false,
+      width: 170,
+      valueGetter: (params) =>
+        `R$ ${parseFloat(20).toFixed(2) || ''}`,
+    },
+    {
       field: 'actions',
       cellClassName: verificaQuantidadeRecebida,
       type: 'actions',
