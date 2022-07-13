@@ -57,20 +57,13 @@ function preventDefault(event) {
 }
 
 export default function Orders() {
-  const [pedidos, setPedidos] = useState(rows)
+  const [taxa, setTaxa] = useState([])
   useEffect(() => {
     async function loadAll() {
       try {
-        let pedidos = (await client.get("/api/produto"));
-        pedidos = pedidos.data
-        pedidos = pedidos.map((pedido => {
-          return {
-            ...pedido,
-            data_pedido: moment(pedido.data_pedido).format("DD-MM-YYYY")
-          }
-        }))
+        let taxa = (await client.get("/api/taxa"));
 
-        setPedidos(pedidos);
+        setTaxa(taxa.data);
       } catch (error) {
         console.error(error)
       }
@@ -85,23 +78,19 @@ export default function Orders() {
         <TableHead>
           <TableRow>
             <TableCell>ID</TableCell>
-            <TableCell>Marca</TableCell>
-            <TableCell>Modelo</TableCell>
-            <TableCell>Cor</TableCell>
-            <TableCell>Capacidade</TableCell>
-            <TableCell>RAM</TableCell>
+            <TableCell>Freteiro</TableCell>
+            <TableCell>Produto</TableCell>
+            <TableCell>Taxa %</TableCell>
            </TableRow>
         </TableHead>
         <TableBody>
           {
-            pedidos.map((row) => (
+            taxa.map((row) => (
               <TableRow key={row.id}>
                 <TableCell>{row.id}</TableCell>
-                <TableCell>{row.marca}</TableCell>
-                <TableCell>{row.modelo}</TableCell>
-                <TableCell>{row.cor}</TableCell>
-                <TableCell>{row.capacidade}</TableCell>
-                <TableCell>{row.ram??"-"}</TableCell>
+                <TableCell>{row.freteiro?.nome}</TableCell>
+                <TableCell>{`${row.produto?.marca || ''} ${row.produto?.modelo || ''} ${row.produto?.cor || ''} ${row.produto?.ram || ''}`}</TableCell>
+                <TableCell>{(row.taxa*100).toFixed(2)}%</TableCell>
               </TableRow>
             ))}
         </TableBody>
