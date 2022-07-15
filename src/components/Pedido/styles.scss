@@ -7,6 +7,8 @@
 
   .form-row {
     display: flex;
+    margin-top: 10px;
+
 
     & .margin-r {
       margin-right: 10px;
@@ -16,4 +18,11 @@
       margin-left: 10px;
     }
 
+    & .margin-t {
+      margin-top: 10px;
+    }
+
+    & .margin-b {
+      margin-bottom: 10px;
+    }
   }
