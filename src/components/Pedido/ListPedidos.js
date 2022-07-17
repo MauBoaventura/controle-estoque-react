@@ -65,7 +65,7 @@ export default function ListPedidos() {
         );
       }
       else {
-        toast.error(
+        toast(
           <Toast
             type='error'
             title='Pedido'
