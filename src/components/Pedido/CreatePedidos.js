@@ -1,11 +1,14 @@
 /*eslint-disable */
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
+import { parseISO } from 'date-fns';
+import { toast } from 'react-toastify';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import InputAdornment from '@mui/material/InputAdornment';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -13,18 +16,12 @@ import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-
-import { useNavigate } from "react-router-dom";
-import { parseISO } from 'date-fns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import Toast from '../Toast/Toast';
-import { toast } from 'react-toastify';
 
+import Toast from '../Toast/Toast';
 
 import { client } from "../../services";
 
-import { useFormik, FieldArray } from 'formik';
-import * as Yup from 'yup';
 
 import {
   TICKET_CREATED,
@@ -41,7 +38,6 @@ export default
   const [fornecedores, setFornecedores] = useState([])
   const [produtos, setProdutos] = useState([])
   const [listProdutos, setListProdutos] = useState([])
-  const [taxas, setTaxas] = useState([])
 
   const [requesting, setRequesting] = useState(false);
   const [initialValues, setInitialValues] = useState({
@@ -95,7 +91,6 @@ export default
       setRequesting(false)
     }
   };
-
   const formik = useFormik({
     initialValues,
     validationSchema,
@@ -141,15 +136,6 @@ export default
         console.error(error)
       }
 
-      //Carrega taxas de produtos
-      try {
-        let taxas = (await client.get("/api/taxa/"));
-        // taxas = taxas.data.map((item) => ({ label: `${item.marca || ''} ${item.modelo || ''} ${item.cor || ''} ${item.ram || ''}`, id: item.id }))
-        setTaxas(taxas);
-      } catch (error) {
-        console.error(error)
-      }
-
       setListProdutos([0])
     }
     loadAll()
@@ -163,7 +149,6 @@ export default
             let taxa = (await client.get(`/api/taxa/?freteiro_id=${produto.freteiro_id}&produto_id=${produto.produto_id}`));
             if (taxa.status === 200) {
               taxa = taxa.data.taxa
-              // console.log(taxa * 100)
               formik.setFieldValue(`produtos.${index}.taxa`, (taxa * 100).toFixed(2), true)
             } else {
               formik.setFieldValue(`produtos.${index}.taxa`, (5).toFixed(2), true)
@@ -171,14 +156,11 @@ export default
           } catch (error) {
             formik.setFieldValue(`produtos.${index}.taxa`, 0, true)
           }
-        } else {
-          formik.setFieldValue(`produtos.${index}.taxa`, 0, true)
         }
       })
     }
     if (formik.values.produtos.length !== 0)
       load()
-
   }, [...formik.values.produtos])
 
 
