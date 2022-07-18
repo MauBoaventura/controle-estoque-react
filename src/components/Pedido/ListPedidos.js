@@ -39,10 +39,6 @@ const verificaQuantidadeRecebida = (params) => {
   }
 }
 
-// const useFakeMutation = () => {
-//   return React.
-// };
-
 export default function ListPedidos() {
   const history = useNavigate();
   const [pedidos, setPedidos] = useState([])
@@ -253,22 +249,9 @@ export default function ListPedidos() {
   };
 
 // Edit row 
-  const mutateRow = useCallback(
-    async(user) =>
-      new Promise((resolve, reject) =>
-        setTimeout(() => {
-          if (user?.quantidade_recebida > user?.quantidade_solicitada) {
-            reject(new Error("Error while saving user: name can't be empty."));
-          } else {
-            resolve({ ...user, name: user.name?.toUpperCase() });
-          }
-        }, 200),
-      ),
-    [],
-  );;
-
   const processRowUpdate = useCallback(
     async (rowEdited) => {
+      delete rowEdited['data_pedido']
       // Make the HTTP request to save in the backend
       let response = (await client.put("/api/pedido/" + rowEdited.id, rowEdited)).data;
       response = {
@@ -285,7 +268,7 @@ export default function ListPedidos() {
       );
       return response;
     },
-    [mutateRow],
+    [],
   );
 
   return (
