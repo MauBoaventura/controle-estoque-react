@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useCallback} from 'react';
 import { useNavigate } from "react-router-dom";
+import { parseISO } from 'date-fns';
+
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
@@ -19,7 +21,7 @@ import { CircularProgress } from '@mui/material';
 import { client } from "../../services";
 import Toast from "../Toast/Toast";
 
-import { TICKET_DELETED, TICKET_ERROR } from '../../constants/Messages'
+import { TICKET_DELETED, TICKET_ERROR, TICKET_UPDATE } from '../../constants/Messages'
 
 import './styles.scss';
 
@@ -36,6 +38,10 @@ const verificaQuantidadeRecebida = (params) => {
       return 'nenhum'
   }
 }
+
+// const useFakeMutation = () => {
+//   return React.
+// };
 
 export default function ListPedidos() {
   const history = useNavigate();
@@ -93,27 +99,23 @@ export default function ListPedidos() {
     },
     {
       field: 'data_pedido',
-      cellClassName: verificaQuantidadeRecebida,
       headerName: 'Data Pedido',
       type: 'date',
       width: 130,
     },
     {
       field: 'lote',
-      cellClassName: verificaQuantidadeRecebida,
       headerName: 'Lote',
       type: 'number',
       width: 90,
     },
     {
       field: 'fornecedor_nome', headerName: 'Fornecedor', width: 130,
-      cellClassName: verificaQuantidadeRecebida,
       valueGetter: (params) =>
         `${params.row.fornecedor?.nome || ''}`
     },
     {
       field: 'Produto',
-      cellClassName: verificaQuantidadeRecebida,
       headerName: 'Produto',
       description: 'This column has a value getter and is not sortable.',
       sortable: false,
@@ -123,35 +125,33 @@ export default function ListPedidos() {
     },
     {
       field: 'quantidade_solicitada',
-      cellClassName: verificaQuantidadeRecebida,
-      headerName: 'Quantidade solicitada',
+      headerName: 'Qtd Solicitada',
       description: 'This column has a value getter and is not sortable.',
       sortable: false,
-      width: 170,
+      width: 110,
       valueGetter: (params) =>
         `${params.row.quantidade_solicitada || ''}`,
     },
     {
       field: 'quantidade_recebida',
-      cellClassName: verificaQuantidadeRecebida,
-      headerName: 'Quantidade Recebida',
+      headerName: 'Qtd Recebida',
       description: 'This column has a value getter and is not sortable.',
       sortable: false,
-      width: 170,
+      editable: true,
+      type: 'number',
+      width: 100,
       valueGetter: (params) =>
         `${params.row.quantidade_recebida || '0'}`,
     },
     {
       field: 'valor_produto',
-      cellClassName: verificaQuantidadeRecebida,
-      headerName: 'Valor do produto',
-      width: 170,
+      headerName: 'Preço unitario',
+      width: '120',
       valueGetter: (params) =>
-        `R$ ${params.row.valor_produto || ''}`,
+        `$ ${params.row.valor_produto || ''}`,
     },
     {
       field: 'dolar',
-      cellClassName: verificaQuantidadeRecebida,
       headerName: 'Dólar',
       width: 70,
       valueGetter: (params) =>
@@ -159,35 +159,31 @@ export default function ListPedidos() {
     },
     {
       field: 'total_nota',
-      cellClassName: verificaQuantidadeRecebida,
       headerName: 'Total em reais',
       description: 'This column has a value getter and is not sortable.',
       sortable: false,
-      width: 170,
+      width: 120,
       valueGetter: (params) =>
         `R$ ${parseFloat(params.row.valor_produto * params.row.dolar_compra * params.row.quantidade_solicitada).toFixed(2) || ''}`,
     },
     {
       field: 'comissao',
-      cellClassName: verificaQuantidadeRecebida,
       headerName: 'Comissão',
       sortable: false,
-      width: 170,
+      width: 120,
       valueGetter: (params) =>
         `R$ ${parseFloat(params.row.valor_produto * params.row.dolar_compra * params.row.quantidade_solicitada * (params.row?.taxa_transporte_produto?.taxa??0.05)).toFixed(2) || ''}`,
     },
     {
       field: 'total_frete',
-      cellClassName: verificaQuantidadeRecebida,
       headerName: 'Frete',
       sortable: false,
-      width: 170,
+      width: 100,
       valueGetter: (params) =>
         `R$ ${parseFloat(20).toFixed(2) || ''}`,
     },
     {
       field: 'actions',
-      cellClassName: verificaQuantidadeRecebida,
       type: 'actions',
       width: 80,
       getActions: (params) => [
@@ -221,7 +217,7 @@ export default function ListPedidos() {
         pedidos = pedidos.map((pedido => {
           return {
             ...pedido,
-            data_pedido: moment(pedido.data_pedido.slice(0, 10)).format("DD-MM-YYYY")
+            data_pedido: moment(pedido.data_pedido?.slice(0, 10)).format("DD-MM-YYYY")
           }
         }))
         setPedidos(pedidos);
@@ -255,6 +251,42 @@ export default function ListPedidos() {
   const handleCloseAndDelete = () => {
     history("/pedidos");
   };
+
+// Edit row 
+  const mutateRow = useCallback(
+    async(user) =>
+      new Promise((resolve, reject) =>
+        setTimeout(() => {
+          if (user?.quantidade_recebida > user?.quantidade_solicitada) {
+            reject(new Error("Error while saving user: name can't be empty."));
+          } else {
+            resolve({ ...user, name: user.name?.toUpperCase() });
+          }
+        }, 200),
+      ),
+    [],
+  );;
+
+  const processRowUpdate = useCallback(
+    async (rowEdited) => {
+      // Make the HTTP request to save in the backend
+      let response = (await client.put("/api/pedido/" + rowEdited.id, rowEdited)).data;
+      response = {
+        ...response,
+        data_pedido: moment(pedido.data_pedido?.slice(0, 10)).format("DD-MM-YYYY")
+      }
+      console.log(response)
+      toast(
+        <Toast
+          type='success'
+          title='Pedido'
+          text={TICKET_UPDATE}
+        />
+      );
+      return response;
+    },
+    [mutateRow],
+  );
 
   return (
     <React.Fragment>
@@ -320,6 +352,11 @@ export default function ListPedidos() {
               columns={columns}
               pageSize={10}
               rowsPerPageOptions={[10]}
+              disableMultipleSelection={true}
+              disableSelectionOnClick
+              // rowHeight={30}
+              experimentalFeatures={{ newEditingApi: true }}
+              processRowUpdate={processRowUpdate}
             />
           </div>
         }

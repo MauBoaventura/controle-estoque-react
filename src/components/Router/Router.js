@@ -9,6 +9,7 @@ import PedidoCreate from '../../screens/PedidoCreate/PedidoCreate';
 import Fornecedor from '../../screens/Fornecedor/Fornecedor';
 import Freteiro from '../../screens/Freteiro/Freteiro';
 import Taxa from '../../screens/Taxa/Taxa';
+import Recebido from '../../screens/Recebido/Recebido.js';
 
 const Routerr = () => {
 
@@ -26,6 +27,7 @@ const Routerr = () => {
           <Route path='/fornecedores' element={<Fornecedor />} />
           <Route path='/freteiros' element={<Freteiro />} />
           <Route path='/taxas' element={<Taxa />} />
+          <Route path='/recebidos' element={<Recebido />} />
           <Route path='/login' element={<Login />} />
           <Route path='*' element={<h1>Not Found</h1>} />
         </Routes>

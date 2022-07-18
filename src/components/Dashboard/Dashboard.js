@@ -34,7 +34,7 @@ const drawerWidth = 240;
 const mdTheme = createTheme();
 
 function DashboardContent() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const toggleDrawer = () => {
     setOpen(!open);
   };
