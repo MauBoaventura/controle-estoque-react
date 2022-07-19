@@ -21,7 +21,14 @@ import { CircularProgress } from '@mui/material';
 import { client } from "../../services";
 import Toast from "../Toast/Toast";
 
-import { TICKET_DELETED, TICKET_ERROR, TICKET_UPDATE } from '../../constants/Messages'
+import {
+  TICKET_DELETED, 
+  TICKET_ERROR, 
+  TICKET_UPDATE, 
+  TICKET_UPDATE_ERROR, 
+  TICKET_QUNT_1_ERROR, 
+  TICKET_QUNT_2_ERROR,
+} from '../../constants/Messages'
 
 import './styles.scss';
 
@@ -248,32 +255,64 @@ export default function ListPedidos() {
     history("/pedidos");
   };
 
-// Edit row 
+  // Edit row 
   const processRowUpdate = useCallback(
-    async (rowEdited) => {
-      delete rowEdited['data_pedido']
-      // Make the HTTP request to save in the backend
-      let response = (await client.put("/api/pedido/" + rowEdited.id, rowEdited)).data;
-      response = {
-        ...response,
-        data_pedido: moment(pedido.data_pedido?.slice(0, 10)).format("DD-MM-YYYY")
+    async (rowEdited, rowOldValues) => {
+      try {
+        // Quantidade recebida maior que a solicitada
+        if (rowEdited.quantidade_recebida > rowOldValues.quantidade_solicitada) {
+          toast(
+            <Toast
+              type='error'
+              title='Pedido'
+              text={TICKET_QUNT_1_ERROR}
+            />
+          );
+          return rowOldValues;
+        }
+
+        // Quantidade recebida menor que a pré-existente
+        if (rowEdited.quantidade_recebida < rowOldValues.quantidade_recebida) {
+          toast(
+            <Toast
+              type='error'
+              title='Pedido'
+              text={TICKET_QUNT_2_ERROR}
+            />
+          );
+          return rowOldValues;
+        }
+        delete rowEdited['data_pedido']
+
+        let response = (await client.put("/api/pedido/" + rowEdited.id, rowEdited)).data;
+        response = {
+          ...response,
+          data_pedido: moment(pedido.data_pedido?.slice(0, 10)).format("DD-MM-YYYY")
+        }
+        toast(
+          <Toast
+            type='success'
+            title='Pedido'
+            text={TICKET_UPDATE}
+          />
+        );
+        return response;
+      } catch (error) {
+        toast(
+          <Toast
+            type='error'
+            title='Pedido'
+            text={TICKET_UPDATE_ERROR}
+          />
+        );
       }
-      console.log(response)
-      toast(
-        <Toast
-          type='success'
-          title='Pedido'
-          text={TICKET_UPDATE}
-        />
-      );
-      return response;
     },
     [],
   );
 
   return (
     <React.Fragment>
-      <div>
+      <div className='list-pedidos'>
         <Button
           id="basic-button"
           aria-controls={open ? 'basic-menu' : undefined}

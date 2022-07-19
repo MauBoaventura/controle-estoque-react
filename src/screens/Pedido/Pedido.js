@@ -20,7 +20,7 @@ const Pedido = () => {
       };
       return (
             <ThemeProvider theme={mdTheme}>
-                  <Box sx={{ display: 'flex' }}>
+                  <Box className='pedido' >
                         <CssBaseline />
                         <AppBar title='Dashboard' toggleDrawer={toggleDrawer} drawerWidth={drawerWidth} open={open} />
                         <Drawer toggleDrawer={toggleDrawer} drawerWidth={drawerWidth} open={open} />
