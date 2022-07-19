@@ -1,4 +1,4 @@
-import React, { useEffect, useState , useCallback} from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
@@ -14,18 +14,17 @@ import DialogActions from '@mui/material/DialogActions';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { toast } from 'react-toastify';
 
-import Title from './Title';
 
 import { CircularProgress } from '@mui/material';
 import { client } from "../../services";
 import Toast from "../Toast/Toast";
 
 import {
-  TICKET_DELETED, 
-  TICKET_ERROR, 
-  TICKET_UPDATE, 
-  TICKET_UPDATE_ERROR, 
-  TICKET_QUNT_1_ERROR, 
+  TICKET_DELETED,
+  TICKET_ERROR,
+  TICKET_UPDATE,
+  TICKET_UPDATE_ERROR,
+  TICKET_QUNT_1_ERROR,
   TICKET_QUNT_2_ERROR,
 } from '../../constants/Messages'
 
@@ -45,9 +44,9 @@ const verificaQuantidadeRecebida = (params) => {
   }
 }
 
-export default function ListPedidos() {
+export default function ListEstoque() {
   const history = useNavigate();
-  const [pedidos, setPedidos] = useState([])
+  const [estoque, setEstoque] = useState([])
   const [pedido, setPedido] = useState({})
   const [requesting, setRequesting] = useState(true)
   const [openDialogDelete, setOpenDialogDelete] = useState(false)
@@ -79,7 +78,7 @@ export default function ListPedidos() {
           />
         );
       }
-      setPedidos((r) => r.filter((x) => pedido.id !== x.id));
+      setEstoque((r) => r.filter((x) => pedido.id !== x.id));
       setPedido({});
     } catch (error) {
       console.error(error)
@@ -100,89 +99,53 @@ export default function ListPedidos() {
       width: 70,
     },
     {
-      field: 'data_pedido',
-      headerName: 'Data Pedido',
+      field: 'data_recebimento',
+      headerName: 'Data Recebimento',
       type: 'date',
-      width: 130,
+      width: 150,
     },
     {
       field: 'lote',
       headerName: 'Lote',
-      type: 'number',
-      width: 90,
-    },
-    {
-      field: 'fornecedor_nome', headerName: 'Fornecedor', width: 130,
+      width: 70,
       valueGetter: (params) =>
-        `${params.row.fornecedor?.nome || ''}`
+        `${params.row.pedidos_fornecedor.lote || ''}`,
     },
     {
       field: 'Produto',
       headerName: 'Produto',
-      description: 'This column has a value getter and is not sortable.',
-      sortable: false,
       width: 260,
       valueGetter: (params) =>
-        `${params.row.produto?.marca || ''} ${params.row.produto?.modelo || ''} ${params.row.produto?.cor || ''} ${params.row.produto?.ram || ''}`,
-    },
-    {
-      field: 'quantidade_solicitada',
-      headerName: 'Qtd Solicitada',
-      description: 'This column has a value getter and is not sortable.',
-      sortable: false,
-      width: 110,
-      valueGetter: (params) =>
-        `${params.row.quantidade_solicitada || ''}`,
-    },
-    {
-      field: 'quantidade_recebida',
-      headerName: 'Qtd Recebida',
-      description: 'This column has a value getter and is not sortable.',
-      sortable: false,
-      editable: true,
-      type: 'number',
-      width: 100,
-      valueGetter: (params) =>
-        `${params.row.quantidade_recebida || '0'}`,
+        `${params.row.pedidos_fornecedor.produto?.marca || ''} ${params.row.pedidos_fornecedor.produto?.modelo || ''} ${params.row.pedidos_fornecedor.produto?.cor || ''} ${params.row.pedidos_fornecedor.produto?.ram || ''}`,
     },
     {
       field: 'valor_produto',
-      headerName: 'Preço unitario',
+      headerName: 'Preço Compra',
       width: '120',
       valueGetter: (params) =>
-        `$ ${params.row.valor_produto || ''}`,
+        `R$ ${(params.row.pedidos_fornecedor.valor_produto * params.row.pedidos_fornecedor.dolar_compra).toFixed(2) || ''}`,
     },
     {
-      field: 'dolar',
-      headerName: 'Dólar',
-      width: 70,
+      field: 'valor_venda',
+      headerName: 'Preço Venda',
+      width: 120,
+      editable: true,
       valueGetter: (params) =>
-        `$ ${params.row.dolar_compra || ''}`,
+        `R$ ${params.row.valor_venda || '0'}`,
     },
     {
-      field: 'total_nota',
-      headerName: 'Total em reais',
-      description: 'This column has a value getter and is not sortable.',
-      sortable: false,
+      field: 'desconto',
+      headerName: 'Desconto',
       width: 120,
       valueGetter: (params) =>
-        `R$ ${parseFloat(params.row.valor_produto * params.row.dolar_compra * params.row.quantidade_solicitada).toFixed(2) || ''}`,
+        `R$ ${params.row.desconto || '0'}`,
     },
     {
-      field: 'comissao',
-      headerName: 'Comissão',
-      sortable: false,
+      field: 'total_produtos_em_estoque',
+      headerName: 'Total em estoque',
       width: 120,
       valueGetter: (params) =>
-        `R$ ${parseFloat(params.row.valor_produto * params.row.dolar_compra * params.row.quantidade_solicitada * (params.row?.taxa_transporte_produto?.taxa??0.05)).toFixed(2) || ''}`,
-    },
-    {
-      field: 'total_frete',
-      headerName: 'Frete',
-      sortable: false,
-      width: 100,
-      valueGetter: (params) =>
-        `R$ ${parseFloat(20).toFixed(2) || ''}`,
+        `${params.row.total_produtos_em_estoque || '0'} uni`,
     },
     {
       field: 'actions',
@@ -214,15 +177,15 @@ export default function ListPedidos() {
   useEffect(() => {
     async function loadAll() {
       try {
-        let pedidos = (await client.get("/api/pedido"));
-        pedidos = pedidos.data
-        pedidos = pedidos.map((pedido => {
+        let estoque = (await client.get("/api/estoque?group=true"));
+        estoque = estoque.data
+        estoque = estoque.map((estoque => {
           return {
-            ...pedido,
-            data_pedido: moment(pedido.data_pedido?.slice(0, 10)).format("DD-MM-YYYY")
+            ...estoque,
+            data_recebimento: moment(estoque.data_recebimento?.slice(0, 10)).format("DD-MM-YYYY")
           }
         }))
-        setPedidos(pedidos);
+        setEstoque(estoque);
       } catch (error) {
         console.error(error)
       }
@@ -243,7 +206,7 @@ export default function ListPedidos() {
     // history("/");
   };
   const handleCloseAndNew = () => {
-    history("/pedidos/criar");
+    history("/estoque/criar");
 
   };
   const handleCloseAndEdit = () => {
@@ -251,7 +214,7 @@ export default function ListPedidos() {
 
   };
   const handleCloseAndDelete = () => {
-    history("/pedidos");
+    history("/estoque");
   };
 
   // Edit row 
@@ -283,11 +246,11 @@ export default function ListPedidos() {
         }
         delete rowEdited['data_pedido']
 
-        let response = (await client.put("/api/pedido/" + rowEdited.id, rowEdited)).data;
-        response = {
-          ...response,
-          data_pedido: moment(pedido.data_pedido?.slice(0, 10)).format("DD-MM-YYYY")
-        }
+        // let response = (await client.put("/api/pedido/" + rowEdited.id, rowEdited)).data;
+        // response = {
+        //   ...response,
+        //   data_pedido: moment(pedido.data_pedido?.slice(0, 10)).format("DD-MM-YYYY")
+        // }
         toast(
           <Toast
             type='success'
@@ -295,7 +258,8 @@ export default function ListPedidos() {
             text={TICKET_UPDATE}
           />
         );
-        return response;
+        // return response;
+        return rowEdited;
       } catch (error) {
         toast(
           <Toast
@@ -312,7 +276,7 @@ export default function ListPedidos() {
 
   return (
     <React.Fragment>
-      <div className='list-pedidos'>
+      <div className='list-estoque'>
         <Button
           id="basic-button"
           aria-controls={open ? 'basic-menu' : undefined}
@@ -321,7 +285,7 @@ export default function ListPedidos() {
           onClick={handleClick}
           size='large'
         >
-          Todos Pedidos
+          Estoque
         </Button>
         <Menu
           id="basic-menu"
@@ -337,8 +301,7 @@ export default function ListPedidos() {
           <MenuItem onClick={handleCloseAndDelete}>Deletar</MenuItem>
         </Menu>
       </div>
-      <Title>
-      </Title>
+
       <div className='content'>
         <Dialog
           open={openDialogDelete}
@@ -370,7 +333,7 @@ export default function ListPedidos() {
         {requesting ? <CircularProgress /> :
           <div style={{ height: 400, width: '100%' }}>
             <DataGrid
-              rows={pedidos}
+              rows={estoque}
               columns={columns}
               pageSize={10}
               rowsPerPageOptions={[10]}

@@ -30,8 +30,8 @@ export const mainListItems = (
         <PeopleIcon />
       </ListItemIcon>
       <ListItemText primary="Freteiros" />
-    </ListItemButton> 
-       <ListItemButton href='/fornecedores'>
+    </ListItemButton>
+    <ListItemButton href='/fornecedores'>
       <ListItemIcon>
         <ShoppingCartIcon />
       </ListItemIcon>
@@ -43,11 +43,17 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Taxas" />
     </ListItemButton>
-    <ListItemButton href='/recebidos'>
+    <ListItemButton href='/estoque'>
       <ListItemIcon>
-        <SettingsCellIcon/>
+        <SettingsCellIcon />
       </ListItemIcon>
-      <ListItemText primary="Produtos Recebidos" />
+      <ListItemText primary="Estoque" />
+    </ListItemButton>
+    <ListItemButton href='/estoqueresumido'>
+      <ListItemIcon>
+        <SettingsCellIcon />
+      </ListItemIcon>
+      <ListItemText primary="Estoque Resumido" />
     </ListItemButton>
   </React.Fragment>
 );
