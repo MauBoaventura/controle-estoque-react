@@ -86,18 +86,7 @@ export default function ListEstoque() {
     setOpenDialogDelete(false);
   };
 
-  const handelDeleteRow = (params) => {
-    setOpenDialogDelete(true);
-    setPedido(params.row)
-  }
-
   const columns = [
-    {
-      field: 'id',
-      cellClassName: verificaQuantidadeRecebida,
-      headerName: 'ID',
-      width: 70,
-    },
     {
       field: 'data_recebimento',
       headerName: 'Data Recebimento',
@@ -110,6 +99,14 @@ export default function ListEstoque() {
       width: 70,
       valueGetter: (params) =>
         `${params.row.pedidos_fornecedor.lote || ''}`,
+    },
+    {
+      field: 'pedidos_fornecedor_id',
+      headerName: 'ID pedido',
+      hide: true,
+      width: 70,
+      valueGetter: (params) =>
+        `${params.row.pedidos_fornecedor_id || ''}`,
     },
     {
       field: 'Produto',
@@ -128,49 +125,32 @@ export default function ListEstoque() {
     {
       field: 'valor_venda',
       headerName: 'Preço Venda',
+      type:'number',
       width: 120,
       editable: true,
       valueGetter: (params) =>
+        // params.row?.valor_venda?.length <= 3 ? `R$ ${params.row.valor_venda || '0'}` : `${params.row.valor_venda || 'R$ 0'}`,
         `R$ ${params.row.valor_venda || '0'}`,
-    },
-    {
-      field: 'desconto',
-      headerName: 'Desconto',
-      width: 120,
-      valueGetter: (params) =>
-        `R$ ${params.row.desconto || '0'}`,
     },
     {
       field: 'total_produtos_em_estoque',
       headerName: 'Total em estoque',
-      width: 120,
+      width: 150,
       valueGetter: (params) =>
         `${params.row.total_produtos_em_estoque || '0'} uni`,
     },
-    {
-      field: 'actions',
-      type: 'actions',
-      width: 80,
-      getActions: (params) => [
-        <GridActionsCellItem
-          icon={<DeleteIcon />}
-          label="Delete"
-          onClick={() => { handelDeleteRow(params) }}
-        />,
-        // <GridActionsCellItem
-        //   icon={<SecurityIcon />}
-        //   label="Toggle Admin"
-        //   onClick={() => { }}
-        //   showInMenu
-        // />,
-        // <GridActionsCellItem
-        //   icon={<FileCopyIcon />}
-        //   label="Duplicate User"
-        //   onClick={() => { }}
-        //   showInMenu
-        // />,
-      ],
-    },
+    // {
+    //   field: 'actions',
+    //   type: 'actions',
+    //   width: 80,
+    //   getActions: (params) => [
+    //     <GridActionsCellItem
+    //       icon={<DeleteIcon />}
+    //       label="Delete"
+    //       onClick={() => { handelDeleteRow(params) }}
+    //     />,
+    //   ],
+    // },
   ];
 
 
@@ -246,11 +226,13 @@ export default function ListEstoque() {
         }
         delete rowEdited['data_pedido']
 
-        // let response = (await client.put("/api/pedido/" + rowEdited.id, rowEdited)).data;
-        // response = {
-        //   ...response,
-        //   data_pedido: moment(pedido.data_pedido?.slice(0, 10)).format("DD-MM-YYYY")
-        // }
+        let valor_venda = rowEdited.valor_venda
+        if (typeof valor_venda === 'string' || valor_venda instanceof String) {
+          valor_venda = rowEdited.valor_venda.replace('R', '').replace('$', '').replace(' ', '')
+        }
+        console.log(rowEdited)
+        await client.put(`/api/estoque?pedidos_fornecedor_id=${rowEdited.pedidos_fornecedor_id}`, { valor_venda });
+
         toast(
           <Toast
             type='success'
@@ -258,8 +240,7 @@ export default function ListEstoque() {
             text={TICKET_UPDATE}
           />
         );
-        // return response;
-        return rowEdited;
+        return { ...rowEdited, valor_venda  };
       } catch (error) {
         toast(
           <Toast
