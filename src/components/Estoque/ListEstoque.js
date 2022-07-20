@@ -93,8 +93,8 @@ export default function ListEstoque() {
 
   const columns = [
     {
-      field: 'id',
-      cellClassName: verificaQuantidadeRecebida,
+      // field: 'id',
+      // cellClassName: verificaQuantidadeRecebida,
       headerName: 'ID',
       width: 70,
     },
@@ -128,34 +128,43 @@ export default function ListEstoque() {
     {
       field: 'desconto',
       headerName: 'Desconto',
+      editable: true,
+      type:'number',
       width: 120,
       valueGetter: (params) =>
         `R$ ${params.row.desconto || '0'}`,
     },
     {
-      field: 'actions',
-      type: 'actions',
-      width: 80,
-      getActions: (params) => [
-        <GridActionsCellItem
-          icon={<DeleteIcon />}
-          label="Delete"
-          onClick={() => { handelDeleteRow(params) }}
-        />,
-        // <GridActionsCellItem
-        //   icon={<SecurityIcon />}
-        //   label="Toggle Admin"
-        //   onClick={() => { }}
-        //   showInMenu
-        // />,
-        // <GridActionsCellItem
-        //   icon={<FileCopyIcon />}
-        //   label="Duplicate User"
-        //   onClick={() => { }}
-        //   showInMenu
-        // />,
-      ],
+      field: 'preco_final',
+      headerName: 'Preço final',
+      width: 120,
+      valueGetter: (params) =>
+        `R$ ${params.row.valor_venda - params.row.desconto || '0'}`,
     },
+    // {
+    //   field: 'actions',
+    //   type: 'actions',
+    //   width: 80,
+    //   getActions: (params) => [
+    //     <GridActionsCellItem
+    //       icon={<DeleteIcon />}
+    //       label="Delete"
+    //       onClick={() => { handelDeleteRow(params) }}
+    //     />,
+    //     // <GridActionsCellItem
+    //     //   icon={<SecurityIcon />}
+    //     //   label="Toggle Admin"
+    //     //   onClick={() => { }}
+    //     //   showInMenu
+    //     // />,
+    //     // <GridActionsCellItem
+    //     //   icon={<FileCopyIcon />}
+    //     //   label="Duplicate User"
+    //     //   onClick={() => { }}
+    //     //   showInMenu
+    //     // />,
+    //   ],
+    // },
   ];
 
 
@@ -211,7 +220,7 @@ export default function ListEstoque() {
           toast(
             <Toast
               type='error'
-              title='Pedido'
+              title='estoque'
               text={TICKET_QUNT_1_ERROR}
             />
           );
@@ -223,32 +232,41 @@ export default function ListEstoque() {
           toast(
             <Toast
               type='error'
-              title='Pedido'
+              title='estoque'
               text={TICKET_QUNT_2_ERROR}
             />
           );
           return rowOldValues;
         }
-        delete rowEdited['data_pedido']
+        delete rowEdited['data_recebimento']
 
-        let response = (await client.put("/api/pedido/" + rowEdited.id, rowEdited)).data;
-        response = {
-          ...response,
-          data_pedido: moment(pedido.data_pedido?.slice(0, 10)).format("DD-MM-YYYY")
+        let desconto = rowEdited.desconto
+        if (typeof desconto === 'string' || desconto instanceof String) {
+          desconto = rowEdited.desconto.replace('R', '').replace('$', '').replace(' ', '')
         }
+
+        let response = (await client.put("/api/estoque/" + rowEdited.id, {desconto})).data;
+        console.log(response)
+        // response = {
+        //   ...response,
+        //   data_estoque: moment(estoque.data_estoque?.slice(0, 10)).format("DD-MM-YYYY")
+        // }
         toast(
           <Toast
             type='success'
-            title='Pedido'
+            title='estoque'
             text={TICKET_UPDATE}
           />
         );
-        return response;
+        // return response;
+        // return rowEdited;
+        return { ...rowEdited, desconto  };
+
       } catch (error) {
         toast(
           <Toast
             type='error'
-            title='Pedido'
+            title='estoque'
             text={TICKET_UPDATE_ERROR}
           />
         );
