@@ -104,7 +104,7 @@ useEffect(() => {
       </div>
       <TextField
         id="outlined-number"
-        label="Lote"
+        label="Nota"
         type="number"
         margin='dense'
         sx={{ width: 300 }}

@@ -47,7 +47,7 @@ export default
   });
 
   const validationSchema = Yup.object().shape({
-    lote: Yup.string().required(REQUIRED_FIELD)
+    nota: Yup.string().required(REQUIRED_FIELD)
   });
 
   const onSubmit = async (formValues) => {
@@ -104,7 +104,7 @@ export default
       try {
         let lastpedido = (await client.get("/api/lastpedido"));
         lastpedido = lastpedido.data
-        setInitialValues({ ...initialValues, 'lote': lastpedido + 1 });
+        setInitialValues({ ...initialValues, 'nota': lastpedido + 1 });
       } catch (error) {
         console.error(error)
       }
@@ -248,17 +248,17 @@ export default
             )}
           />
           <TextField
-            id='lote'
-            name='lote'
-            label="Lote"
+            id='nota'
+            name='nota'
+            label="Nota"
             variant='outlined'
 
             autoComplete='on'
             className='margin-l'
             onChange={formik.handleChange}
-            value={formik.values.lote}
-            error={!!formik.errors.lote && formik.touched.lote}
-            helperText={formik.touched.lote && formik.errors.lote}
+            value={formik.values.nota}
+            error={!!formik.errors.nota && formik.touched.nota}
+            helperText={formik.touched.nota && formik.errors.nota}
             disabled={requesting}
             type="number"
             margin='dense'

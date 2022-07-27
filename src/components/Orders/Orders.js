@@ -79,7 +79,7 @@ export default function Orders() {
         <TableHead>
           <TableRow>
             <TableCell>Data pedido</TableCell>
-            <TableCell>Lote</TableCell>
+            <TableCell>Nota</TableCell>
             <TableCell>Fornecedor</TableCell>
             <TableCell>Dolar compra</TableCell>
             <TableCell>Quantidade solicitada</TableCell>
@@ -91,7 +91,7 @@ export default function Orders() {
           pedidos.map((row) => (
             <TableRow key={row.id}>
               <TableCell>{row.data_pedido}</TableCell>
-              <TableCell>{row.lote}</TableCell>
+              <TableCell>{row.nota}</TableCell>
               <TableCell>{row.fornecedor_id}</TableCell>
               <TableCell>{row.dolar_compra}</TableCell>
               <TableCell>{row.quantidade_solicitada}</TableCell>

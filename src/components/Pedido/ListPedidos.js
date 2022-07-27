@@ -106,8 +106,8 @@ export default function ListPedidos() {
       width: 130,
     },
     {
-      field: 'lote',
-      headerName: 'Lote',
+      field: 'nota',
+      headerName: 'Nota',
       type: 'number',
       width: 90,
     },
@@ -360,7 +360,7 @@ export default function ListPedidos() {
             <DialogContentText id="alert-dialog-description">
               {`ID: ${pedido?.id ?? '-'}`}
               <br />
-              {`Lote: ${pedido?.lote ?? '-'}`}
+              {`Nota: ${pedido?.nota ?? '-'}`}
               <br />
               {`Fornecedor: ${pedido?.fornecedor?.nome ?? '-'}`}
               <br />

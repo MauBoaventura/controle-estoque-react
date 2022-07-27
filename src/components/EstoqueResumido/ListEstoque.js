@@ -94,11 +94,11 @@ export default function ListEstoque() {
       width: 150,
     },
     {
-      field: 'lote',
-      headerName: 'Lote',
+      field: 'nota',
+      headerName: 'Nota',
       width: 70,
       valueGetter: (params) =>
-        `${params.row.pedidos_fornecedor?.lote || ''}`,
+        `${params.row.pedidos_fornecedor?.nota || ''}`,
     },
     {
       field: 'pedidos_fornecedor_id',
@@ -297,7 +297,7 @@ export default function ListEstoque() {
             <DialogContentText id="alert-dialog-description">
               {`ID: ${pedido?.id ?? '-'}`}
               <br />
-              {`Lote: ${pedido?.lote ?? '-'}`}
+              {`nota: ${pedido?.nota ?? '-'}`}
               <br />
               {`Fornecedor: ${pedido?.fornecedor?.nome ?? '-'}`}
               <br />
