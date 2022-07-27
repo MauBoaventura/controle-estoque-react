@@ -47,18 +47,18 @@ const verificaQuantidadeRecebida = (params) => {
 export default function ListEstoque() {
   const history = useNavigate();
   const [estoque, setEstoque] = useState([])
-  const [pedido, setPedido] = useState({})
+  const [estoqueRow, setEstoqueRow] = useState({})
   const [requesting, setRequesting] = useState(true)
-  const [openDialogDelete, setOpenDialogDelete] = useState(false)
+  const [openDialogDevolution, setOpenDialogDevolution] = useState(false)
 
   // Dialog 
   const handleDeleteClose = () => {
-    setOpenDialogDelete(false);
+    setOpenDialogDevolution(false);
   };
 
   const handleConfirmeDelete = async () => {
     try {
-      let resposta = (await client.delete("/api/pedido/" + pedido.id));
+      let resposta = (await client.delete("/api/estoque/" + estoqueRow.id));
 
       if (resposta.status === 200) {
         toast(
@@ -78,25 +78,25 @@ export default function ListEstoque() {
           />
         );
       }
-      setEstoque((r) => r.filter((x) => pedido.id !== x.id));
-      setPedido({});
+      setEstoque((r) => r.filter((x) => estoqueRow.id !== x.id));
+      setEstoqueRow({});
     } catch (error) {
       console.error(error)
     }
-    setOpenDialogDelete(false);
+    setOpenDialogDevolution(false);
   };
 
   const handelDeleteRow = (params) => {
-    setOpenDialogDelete(true);
-    setPedido(params.row)
+    setEstoqueRow(params.row)
+    setOpenDialogDevolution(true);
   }
 
   const columns = [
     {
-      // field: 'id',
+      field: 'id',
       // cellClassName: verificaQuantidadeRecebida,
-      headerName: 'ID',
-      width: 70,
+      headerName: '',
+      width: 50,
     },
     {
       field: 'data_recebimento',
@@ -105,18 +105,18 @@ export default function ListEstoque() {
       width: 150,
     },
     {
-      field: 'Produto',
+      field: 'produto',
       headerName: 'Produto',
       width: 260,
       valueGetter: (params) =>
-        `${params.row.pedidos_fornecedor.produto?.marca || ''} ${params.row.pedidos_fornecedor.produto?.modelo || ''} ${params.row.pedidos_fornecedor.produto?.cor || ''} ${params.row.pedidos_fornecedor.produto?.ram || ''}`,
+        `${params.row.pedidos_fornecedor?.produto?.marca || ''} ${params.row.pedidos_fornecedor?.produto?.modelo || ''} ${params.row.pedidos_fornecedor?.produto?.capacidade || ''} ${params.row.pedidos_fornecedor?.produto?.cor || ''} ${params.row.pedidos_fornecedor?.produto?.ram || ''}`,
     },
     {
       field: 'valor_produto',
       headerName: 'Preço Compra',
       width: '120',
       valueGetter: (params) =>
-        `R$ ${(params.row.pedidos_fornecedor.valor_produto * params.row.pedidos_fornecedor.dolar_compra).toFixed(2) || ''}`,
+        `R$ ${(params.row.pedidos_fornecedor?.valor_produto * params.row.pedidos_fornecedor?.dolar_compra).toFixed(2) || ''}`,
     },
     {
       field: 'valor_venda',
@@ -141,30 +141,18 @@ export default function ListEstoque() {
       valueGetter: (params) =>
         `R$ ${params.row.valor_venda - params.row.desconto || '0'}`,
     },
-    // {
-    //   field: 'actions',
-    //   type: 'actions',
-    //   width: 80,
-    //   getActions: (params) => [
-    //     <GridActionsCellItem
-    //       icon={<DeleteIcon />}
-    //       label="Delete"
-    //       onClick={() => { handelDeleteRow(params) }}
-    //     />,
-    //     // <GridActionsCellItem
-    //     //   icon={<SecurityIcon />}
-    //     //   label="Toggle Admin"
-    //     //   onClick={() => { }}
-    //     //   showInMenu
-    //     // />,
-    //     // <GridActionsCellItem
-    //     //   icon={<FileCopyIcon />}
-    //     //   label="Duplicate User"
-    //     //   onClick={() => { }}
-    //     //   showInMenu
-    //     // />,
-    //   ],
-    // },
+    {
+      field: 'actions',
+      type: 'actions',
+      width: 80,
+      getActions: (params) => [
+        <GridActionsCellItem
+          icon={<DeleteIcon />}
+          label="Delete"
+          onClick={() => { handelDeleteRow(params) }}
+        />,
+      ],
+    },
   ];
 
 
@@ -306,7 +294,7 @@ export default function ListEstoque() {
 
       <div className='content'>
         <Dialog
-          open={openDialogDelete}
+          open={openDialogDevolution}
           onClose={handleDeleteClose}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
@@ -316,13 +304,11 @@ export default function ListEstoque() {
           </DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              {`ID: ${pedido?.id ?? '-'}`}
+              {`ID: ${estoqueRow?.id ?? '-'}`}
               <br />
-              {`Lote: ${pedido?.lote ?? '-'}`}
+              {`${estoqueRow?.pedidos_fornecedor?.produto?.marca || ''} ${estoqueRow?.pedidos_fornecedor?.produto?.modelo || ''} ${estoqueRow?.pedidos_fornecedor?.produto?.cor || ''} ${estoqueRow?.pedidos_fornecedor?.produto?.ram || ''}`} 
               <br />
-              {`Fornecedor: ${pedido?.fornecedor?.nome ?? '-'}`}
-              <br />
-              {`Data: ${pedido?.data_pedido ?? '-'}`}
+              {`Data: ${estoqueRow?.data_recebimento ?? '-'}`}
             </DialogContentText>
           </DialogContent>
           <DialogActions>

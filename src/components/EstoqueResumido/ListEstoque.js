@@ -98,7 +98,7 @@ export default function ListEstoque() {
       headerName: 'Lote',
       width: 70,
       valueGetter: (params) =>
-        `${params.row.pedidos_fornecedor.lote || ''}`,
+        `${params.row.pedidos_fornecedor?.lote || ''}`,
     },
     {
       field: 'pedidos_fornecedor_id',

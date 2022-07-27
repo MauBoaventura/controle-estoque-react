@@ -123,7 +123,7 @@ export default function ListPedidos() {
       sortable: false,
       width: 260,
       valueGetter: (params) =>
-        `${params.row.produto?.marca || ''} ${params.row.produto?.modelo || ''} ${params.row.produto?.cor || ''} ${params.row.produto?.ram || ''}`,
+        `${params.row.produto?.marca || ''} ${params.row.produto?.modelo || ''} ${params.row.produto?.capacidade || ''} ${params.row.produto?.cor || ''} ${params.row.produto?.ram || ''}`,
     },
     {
       field: 'quantidade_solicitada',
@@ -150,14 +150,21 @@ export default function ListPedidos() {
       headerName: 'Preço unitario',
       width: '120',
       valueGetter: (params) =>
-        `$ ${params.row.valor_produto || ''}`,
+        `$ ${(params.row.valor_produto).toFixed(2) || ''}`,
     },
     {
       field: 'dolar',
       headerName: 'Dólar',
       width: 70,
       valueGetter: (params) =>
-        `$ ${params.row.dolar_compra || ''}`,
+        `$ ${(params.row.dolar_compra).toFixed(2) || ''}`,
+    },
+    {
+      field: 'valor_compra',
+      headerName: 'Preço compra',
+      width: 120,
+      valueGetter: (params) =>
+        `R$ ${(params.row.dolar_compra * params.row.valor_produto).toFixed(2) || ''}`,
     },
     {
       field: 'total_nota',
