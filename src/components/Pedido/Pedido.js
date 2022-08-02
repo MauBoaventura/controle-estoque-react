@@ -5,7 +5,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import ListPedidos from './ListPedidos';
+import EnhancedTable from '../EnhancedTable/EnhancedTable';
 import EditPedidos from './EditPedidos';
 
 
@@ -28,10 +28,10 @@ function PedidoContent(props) {
       <Toolbar />
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Grid container spacing={3}>
-          {/* Recent ListPedidos */}
+          {/* Recent EnhancedTable */}
           <Grid item xs={12}>
             <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-              {id ? <EditPedidos id={id} /> : <ListPedidos />}
+              {id ? <EditPedidos id={id} /> : <EnhancedTable />}
             </Paper>
           </Grid>
         </Grid>
