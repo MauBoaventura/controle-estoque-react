@@ -22,7 +22,7 @@ const Pedido = () => {
             <ThemeProvider theme={mdTheme}>
                   <Box className='pedido' >
                         <CssBaseline />
-                        <AppBar title='Dashboard' toggleDrawer={toggleDrawer} drawerWidth={drawerWidth} open={open} />
+                        <AppBar title='Pedidos' toggleDrawer={toggleDrawer} drawerWidth={drawerWidth} open={open} />
                         <Drawer toggleDrawer={toggleDrawer} drawerWidth={drawerWidth} open={open} />
                         <PedidoScrean />
                   </Box>
