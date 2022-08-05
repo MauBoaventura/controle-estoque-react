@@ -130,7 +130,7 @@ export default
       //Carrega lista de produtos
       try {
         let produtos = (await client.get("/api/produto/"));
-        produtos = produtos.data.map((item) => ({ label: `${item.marca || ''} ${item.modelo || ''} ${item.cor || ''} ${item.ram || ''}`, id: item.id }))
+        produtos = produtos.data.map((item) => ({ label: `${item.marca || ''} ${item.modelo || ''} ${item.capacidade || ''} ${item.cor || ''} ${item.ram || ''}`, id: item.id }))
         setProdutos(produtos);
       } catch (error) {
         console.error(error)

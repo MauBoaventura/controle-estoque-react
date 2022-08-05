@@ -10,9 +10,14 @@ import Paper from '@mui/material/Paper';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 
+import { client } from "../../services";
+
 import Row from '../Row/Row';
 import EnhancedTableHead from '../EnhancedTableHead/EnhancedTableHead';
 import EnhancedTableToolbar from '../EnhancedTableToolbar/EnhancedTableToolbar';
+import { useEffect } from 'react';
+
+const moment = require('moment');
 
 function createData(name, calories, fat, carbs, protein) {
   return {
@@ -21,36 +26,50 @@ function createData(name, calories, fat, carbs, protein) {
     fat,
     carbs,
     protein,
-    history: [
+    pedido: [
       {
-        date: '2020-01-05',
-        customerId: '11091700',
-        amount: 3,
+        produto: 'IPhone 13',
+        valor_unitario: '1000,00',
+        quantidade_solicitada: 3,
+        frete: 0.15,
+        transporte: 20,
+        total: 300,
       },
       {
-        date: '2020-01-02',
-        customerId: 'Anonymous',
-        amount: 1,
+        produto: 'IPhone 12',
+        valor_unitario: '100,00',
+        quantidade_solicitada: 30,
+        frete: 0.15,
+        transporte: 20,
+        total: 30000,
+      },
+      {
+        produto: 'IPhone 11',
+        valor_unitario: '1000,00',
+        quantidade_solicitada: 3,
+        frete: 555,
+        transporte: 200,
+        total: 300,
       },
     ],
   };
 }
 
-const rows = [
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Donut', 452, 25.0, 51, 4.9),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-  createData('Honeycomb', 408, 3.2, 87, 6.5),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Jelly Bean', 375, 0.0, 94, 0.0),
-  createData('KitKat', 518, 26.0, 65, 7.0),
-  createData('Lollipop', 392, 0.2, 98, 0.0),
-  createData('Marshmallow', 318, 0, 81, 2.0),
-  createData('Nougat', 360, 19.0, 9, 37.0),
-  createData('Oreo', 437, 18.0, 63, 4.0),
-];
+// const rows = [
+//   createData('01/07/2022', 1 , 'Hoeliton', '5,56', '124320,26'),
+//   createData('02/07/2022', 2 , 'Hoeliton', '5,56', '124320,26'),
+//   createData('03/07/2022', 3 , 'Hoeliton', '5,56', '124320,26'),
+//   createData('04/07/2022', 4 , 'Hoeliton', '5,56', '124320,26'),
+//   createData('05/07/2022', 5 , 'Hoeliton', '5,56', '124320,26'),
+//   createData('06/07/2022', 6 , 'Hoeliton', '5,56', '124320,26'),
+//   createData('07/07/2022', 7 , 'Hoeliton', '5,56', '124320,26'),
+//   createData('08/07/2022', 8 , 'Hoeliton', '5,56', '124320,26'),
+//   createData('09/07/2022', 9 , 'Hoeliton', '5,56', '124320,26'),
+//   createData('10/07/2022', 10 , 'Hoeliton', '5,56', '124320,26'),
+//   createData('11/07/2022', 11 , 'Hoeliton', '5,56', '124320,26'),
+//   createData('12/07/2022', 12 , 'Hoeliton', '5,56', '124320,26'),
+//   createData('13/07/2022', 13 , 'Hoeliton', '5,56', '124320,26'),
+// ];
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -84,34 +103,40 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
+    id: 'calories',
+    numeric: false,
+    disablePadding: true,
+    label: 'Nota',
+  },
+  {
     id: 'name',
     numeric: false,
     disablePadding: true,
-    label: 'Dessert (100g serving)',
+    label: 'Data',
   },
   {
-    id: 'calories',
-    numeric: true,
-    disablePadding: false,
-    label: 'Calories',
+    id: 'fornecedor',
+    numeric: false,
+    disablePadding: true,
+    label: 'Fornecedor',
   },
   {
     id: 'fat',
     numeric: true,
-    disablePadding: false,
-    label: 'Fat (g)',
+    disablePadding: true,
+    label: 'Freteiro',
   },
   {
     id: 'carbs',
     numeric: true,
-    disablePadding: false,
-    label: 'Carbs (g)',
+    disablePadding: true,
+    label: 'Dolar ($)',
   },
   {
     id: 'protein',
     numeric: true,
-    disablePadding: false,
-    label: 'Protein (g)',
+    disablePadding: true,
+    label: 'Total (R$)',
   },
 ];
 
@@ -123,6 +148,33 @@ export default function EnhancedTable(props) {
   const [page, setPage] = useState(0);
   const [dense, setDense] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rows, setRows] = useState([]);
+
+  useEffect(() => {
+    async function loadAll() {
+      try {
+        let pedidos = (await client.get("/api/pedidobynota"));
+        pedidos = pedidos.data
+        // console.log(pedidos)
+        // pedidos = pedidos.map((pedido => {
+        //   return {
+        //     ...pedido,
+        //     // data_pedido: moment(pedido.data_pedido?.slice(0, 10)).format("DD-MM-YYYY")
+        //   }
+        // }))
+        setRows(Object.keys(pedidos).map(key => {
+          return pedidos[key];
+        }))
+        // setRows(pedidos);
+      } catch (error) {
+        console.error(error)
+      }
+      // finally {
+      //   setRequesting(false)
+      // }
+    }
+    loadAll()
+  }, [])
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -175,7 +227,7 @@ export default function EnhancedTable(props) {
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
-              headCells= {headCells}
+              headCells={headCells}
             />
             <TableBody>
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:
@@ -187,7 +239,7 @@ export default function EnhancedTable(props) {
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
-                    <Row key={row.name} row={row} labelId={labelId}/>
+                    <Row key={row.name} row={row} labelId={labelId} />
                   );
                 })}
               {emptyRows > 0 && (
@@ -196,7 +248,7 @@ export default function EnhancedTable(props) {
                     height: (dense ? 33 : 53) * emptyRows,
                   }}
                 >
-                  <TableCell colSpan={6} />
+                  <TableCell colSpan={7} />
                 </TableRow>
               )}
             </TableBody>
