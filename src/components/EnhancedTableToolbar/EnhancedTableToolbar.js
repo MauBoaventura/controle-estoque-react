@@ -7,10 +7,14 @@ import Tooltip from '@mui/material/Tooltip';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
-
+import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 
 const EnhancedTableToolbar = (props) => {
-  const { numSelected } = props;
+  const { numSelected, title , onClickAdd} = props;
+
+  const createSortHandler = (property) => (event) => {
+    onClickAdd(event, property);
+  };
 
   return (
     <Toolbar
@@ -39,9 +43,19 @@ const EnhancedTableToolbar = (props) => {
           id="tableTitle"
           component="div"
         >
-          Pedidos
+          {title}
         </Typography>
       )}
+
+      <Tooltip title="Filter list">
+        <IconButton>
+          <AddCircleRoundedIcon 
+          fontSize='large' 
+          color='info'
+          onClick={onClickAdd}
+           />
+        </IconButton>
+      </Tooltip>
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
@@ -62,6 +76,9 @@ const EnhancedTableToolbar = (props) => {
 
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
+  title: PropTypes.string.isRequired,
+  onClickAdd: PropTypes.func.isRequired,
+
 };
 
 export default EnhancedTableToolbar;

@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from "react-router-dom";
+
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -122,7 +124,7 @@ const headCells = [
   },
   {
     id: 'fat',
-    numeric: true,
+    numeric: false,
     disablePadding: true,
     label: 'Freteiro',
   },
@@ -142,6 +144,7 @@ const headCells = [
 
 
 export default function EnhancedTable(props) {
+  const history = useNavigate();
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('calories');
   const [selected, setSelected] = useState([]);
@@ -155,13 +158,6 @@ export default function EnhancedTable(props) {
       try {
         let pedidos = (await client.get("/api/pedidobynota"));
         pedidos = pedidos.data
-        // console.log(pedidos)
-        // pedidos = pedidos.map((pedido => {
-        //   return {
-        //     ...pedido,
-        //     // data_pedido: moment(pedido.data_pedido?.slice(0, 10)).format("DD-MM-YYYY")
-        //   }
-        // }))
         setRows(Object.keys(pedidos).map(key => {
           return pedidos[key];
         }))
@@ -213,7 +209,7 @@ export default function EnhancedTable(props) {
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar numSelected={selected.length} title={'Pedido'}  onClickAdd={()=>{history("/pedidos/criar")}}/>
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
