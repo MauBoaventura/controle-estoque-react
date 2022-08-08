@@ -21,57 +21,6 @@ import { useEffect } from 'react';
 
 const moment = require('moment');
 
-function createData(name, calories, fat, carbs, protein) {
-  return {
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-    pedido: [
-      {
-        produto: 'IPhone 13',
-        valor_unitario: '1000,00',
-        quantidade_solicitada: 3,
-        frete: 0.15,
-        transporte: 20,
-        total: 300,
-      },
-      {
-        produto: 'IPhone 12',
-        valor_unitario: '100,00',
-        quantidade_solicitada: 30,
-        frete: 0.15,
-        transporte: 20,
-        total: 30000,
-      },
-      {
-        produto: 'IPhone 11',
-        valor_unitario: '1000,00',
-        quantidade_solicitada: 3,
-        frete: 555,
-        transporte: 200,
-        total: 300,
-      },
-    ],
-  };
-}
-
-// const rows = [
-//   createData('01/07/2022', 1 , 'Hoeliton', '5,56', '124320,26'),
-//   createData('02/07/2022', 2 , 'Hoeliton', '5,56', '124320,26'),
-//   createData('03/07/2022', 3 , 'Hoeliton', '5,56', '124320,26'),
-//   createData('04/07/2022', 4 , 'Hoeliton', '5,56', '124320,26'),
-//   createData('05/07/2022', 5 , 'Hoeliton', '5,56', '124320,26'),
-//   createData('06/07/2022', 6 , 'Hoeliton', '5,56', '124320,26'),
-//   createData('07/07/2022', 7 , 'Hoeliton', '5,56', '124320,26'),
-//   createData('08/07/2022', 8 , 'Hoeliton', '5,56', '124320,26'),
-//   createData('09/07/2022', 9 , 'Hoeliton', '5,56', '124320,26'),
-//   createData('10/07/2022', 10 , 'Hoeliton', '5,56', '124320,26'),
-//   createData('11/07/2022', 11 , 'Hoeliton', '5,56', '124320,26'),
-//   createData('12/07/2022', 12 , 'Hoeliton', '5,56', '124320,26'),
-//   createData('13/07/2022', 13 , 'Hoeliton', '5,56', '124320,26'),
-// ];
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -149,7 +98,7 @@ export default function EnhancedTable(props) {
   const [orderBy, setOrderBy] = useState('calories');
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
-  const [dense, setDense] = useState(false);
+  const [dense, setDense] = useState(true);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [rows, setRows] = useState([]);
 
@@ -196,9 +145,9 @@ export default function EnhancedTable(props) {
     setPage(0);
   };
 
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
+  // const handleChangeDense = (event) => {
+  //   setDense(event.target.checked);
+  // };
 
   // const isSelected = (name) => selected.indexOf(name) !== -1;
 
@@ -235,7 +184,7 @@ export default function EnhancedTable(props) {
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
-                    <Row key={row.name} row={row} labelId={labelId} />
+                    <Row key={index} rows={row} labelId={labelId} />
                   );
                 })}
               {emptyRows > 0 && (
@@ -260,10 +209,10 @@ export default function EnhancedTable(props) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <FormControlLabel
+      {/* <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
-      />
+      /> */}
     </Box>
   );
 }

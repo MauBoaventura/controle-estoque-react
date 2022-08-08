@@ -45,5 +45,6 @@ export const TICKET_ERROR = 'Erro ao cadastrar pedido.';
 export const TICKET_UPDATE_ERROR = 'Erro ao atualizar pedido.';
 export const TICKET_QUNT_1_ERROR = 'Erro ao atualizar pedido. Quantidade recebida maior que a solicitada';
 export const TICKET_QUNT_2_ERROR = 'Erro ao atualizar pedido. Quantidade recebida menor que a pré-existente';
+export const PRODUCT_DELETED = 'Pedido apagado com sucesso.';
 
 
