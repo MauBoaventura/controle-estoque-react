@@ -16,6 +16,7 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import EditIcon from '@mui/icons-material/Edit';
 import Collapse from '@mui/material/Collapse';
 import { toast } from 'react-toastify';
 
@@ -119,7 +120,8 @@ export default function Row(props) {
                 <TableHead>
                   <TableRow>
                     <TableCell>Produto</TableCell>
-                    <TableCell>Quantidade</TableCell>
+                    <TableCell>Qtd. solicitada</TableCell>
+                    <TableCell>Qtd. recebida</TableCell>
                     <TableCell>Valor unitário ($)</TableCell>
                     <TableCell align="right">Frete (R$)</TableCell>
                     <TableCell align="right">Transporte (R$)</TableCell>
@@ -134,13 +136,14 @@ export default function Row(props) {
                         {`${historyRow?.produto?.marca || ''} ${historyRow?.produto?.modelo || ''} ${historyRow?.produto?.capacidade || ''} ${historyRow?.produto?.cor || ''} ${historyRow?.produto?.ram || ''}`}
                       </TableCell>
                       <TableCell>{historyRow?.quantidade_solicitada}</TableCell>
+                      <TableCell>{historyRow?.quantidade_recebida}</TableCell>
                       <TableCell component="th" scope="row">
                         {formatToDollar(historyRow?.valor_produto)}
                       </TableCell>
                       <TableCell align="right">{formatToReal(row[0]?.dolar_compra * historyRow?.taxa_transporte_produto.taxa * historyRow?.valor_produto * historyRow?.quantidade_solicitada)}</TableCell>
                       <TableCell align="right">{formatToReal(20)}</TableCell>
                       <TableCell align="right">{formatToReal(row[0]?.dolar_compra * historyRow?.valor_produto * historyRow?.quantidade_solicitada - historyRow?.taxa_transporte_produto.taxa * historyRow?.valor_produto * historyRow?.quantidade_solicitada)}</TableCell>
-                      <TableCell align="right">
+                      <TableCell align="right" padding='none'>
                         <IconButton
                           aria-label="expand row"
                           size="small"
@@ -150,6 +153,16 @@ export default function Row(props) {
                           onClick={() => handelDeleteRow(historyRow)}
                           fontSize='small'
                            color='error' />
+                        </IconButton>
+                        <IconButton
+                          aria-label="expand row"
+                          size="small"
+                          onClick={() => handelDeleteRow(historyRow)}
+                        >
+                          <EditIcon 
+                          onClick={() => handelDeleteRow(historyRow)}
+                          fontSize='small'
+                           color='info' />
                         </IconButton>
                       </TableCell>
                       </TableRow>
@@ -171,8 +184,6 @@ export default function Row(props) {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            {/* {`ID: ${pedido?.id ?? '-'}`} */}
-            {/* <br /> */}
             {`Nota: ${pedido?.nota ?? '-'}`}
             <br />
             {`Produto: ${pedido?.produto?.marca || ''} ${pedido?.produto?.modelo || ''} ${pedido?.produto?.capacidade || ''} ${pedido?.produto?.cor || ''} ${pedido?.produto?.ram || ''}`}
@@ -193,21 +204,3 @@ export default function Row(props) {
     </>
   );
 }
-
-// Row?.propTypes = {
-//   row: PropTypes.shape({
-//     calories: PropTypes.number.isRequired,
-//     carbs: PropTypes.number.isRequired,
-//     fat: PropTypes.number.isRequired,
-//     history: PropTypes.arrayOf(
-//       PropTypes.shape({
-//         amount: PropTypes.number.isRequired,
-//         customerId: PropTypes.string.isRequired,
-//         date: PropTypes.string.isRequired,
-//       }),
-//     ).isRequired,
-//     name: PropTypes.string.isRequired,
-//     price: PropTypes.number.isRequired,
-//     protein: PropTypes.number.isRequired,
-//   }).isRequired,
-// };
