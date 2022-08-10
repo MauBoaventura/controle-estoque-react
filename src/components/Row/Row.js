@@ -10,15 +10,18 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
 import DialogContentText from '@mui/material/DialogContentText';
+import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import EditIcon from '@mui/icons-material/Edit';
 import Collapse from '@mui/material/Collapse';
+import TextField from '@mui/material/TextField';
 import { toast } from 'react-toastify';
+
+import RowPedido from "../RowPedido/RowPedido";
 
 import { client } from "../../services";
 import { formatToReal, formatToDollar } from '../../util/formatCoin'
@@ -40,8 +43,6 @@ export default function Row(props) {
 
   const handelDeleteRow = (params) => {
     setOpenDialogDelete(true);
-    // let a = row.filter((x) => pedido.id !== x.id) //map(item=>(item.filter((x) => pedido.id !== x.id)))
-    // console.log(a)
     setPedido(params)
   }
 
@@ -49,6 +50,7 @@ export default function Row(props) {
   const handleDeleteClose = () => {
     setOpenDialogDelete(false);
   };
+
 
   const handleConfirmeDelete = async () => {
     try {
@@ -131,41 +133,7 @@ export default function Row(props) {
                 </TableHead>
                 <TableBody>
                   {row?.map((historyRow) => (
-                    <TableRow key={historyRow?.id} >
-                      <TableCell>
-                        {`${historyRow?.produto?.marca || ''} ${historyRow?.produto?.modelo || ''} ${historyRow?.produto?.capacidade || ''} ${historyRow?.produto?.cor || ''} ${historyRow?.produto?.ram || ''}`}
-                      </TableCell>
-                      <TableCell>{historyRow?.quantidade_solicitada}</TableCell>
-                      <TableCell>{historyRow?.quantidade_recebida}</TableCell>
-                      <TableCell component="th" scope="row">
-                        {formatToDollar(historyRow?.valor_produto)}
-                      </TableCell>
-                      <TableCell align="right">{formatToReal(row[0]?.dolar_compra * historyRow?.taxa_transporte_produto.taxa * historyRow?.valor_produto * historyRow?.quantidade_solicitada)}</TableCell>
-                      <TableCell align="right">{formatToReal(20)}</TableCell>
-                      <TableCell align="right">{formatToReal(row[0]?.dolar_compra * historyRow?.valor_produto * historyRow?.quantidade_solicitada - historyRow?.taxa_transporte_produto.taxa * historyRow?.valor_produto * historyRow?.quantidade_solicitada)}</TableCell>
-                      <TableCell align="right" padding='none'>
-                        <IconButton
-                          aria-label="expand row"
-                          size="small"
-                          onClick={() => handelDeleteRow(historyRow)}
-                        >
-                          <DeleteIcon 
-                          onClick={() => handelDeleteRow(historyRow)}
-                          fontSize='small'
-                           color='error' />
-                        </IconButton>
-                        <IconButton
-                          aria-label="expand row"
-                          size="small"
-                          onClick={() => handelDeleteRow(historyRow)}
-                        >
-                          <EditIcon 
-                          onClick={() => handelDeleteRow(historyRow)}
-                          fontSize='small'
-                           color='info' />
-                        </IconButton>
-                      </TableCell>
-                      </TableRow>
+                    <RowPedido key={historyRow?.id} rowPedido={historyRow} deleteRowAction={()=>handelDeleteRow(historyRow)}/>
                   ))}
                 </TableBody>
               </Table>
