@@ -107,7 +107,7 @@ export default function ListEstoque() {
     {
       field: 'produto',
       headerName: 'Produto',
-      width: 260,
+      width: 380,
       valueGetter: (params) =>
         `${params.row.pedidos_fornecedor?.produto?.marca || ''} ${params.row.pedidos_fornecedor?.produto?.modelo || ''} ${params.row.pedidos_fornecedor?.produto?.capacidade || ''} ${params.row.pedidos_fornecedor?.produto?.cor || ''} ${params.row.pedidos_fornecedor?.produto?.ram || ''}`,
     },
@@ -125,21 +125,21 @@ export default function ListEstoque() {
       valueGetter: (params) =>
         `R$ ${params.row.valor_venda || '0'}`,
     },
-    {
-      field: 'desconto',
-      headerName: 'Desconto',
-      editable: true,
-      type:'number',
-      width: 120,
-      valueGetter: (params) =>
-        `R$ ${params.row.desconto || '0'}`,
-    },
+    // {
+    //   field: 'desconto',
+    //   headerName: 'Desconto',
+    //   editable: true,
+    //   type:'number',
+    //   width: 120,
+    //   valueGetter: (params) =>
+    //     `R$ ${params.row.desconto || '0'}`,
+    // },
     {
       field: 'preco_final',
       headerName: 'Preço final',
       width: 120,
       valueGetter: (params) =>
-        `R$ ${params.row.valor_venda - params.row.desconto || '0'}`,
+        `R$ ${params.row.valor_venda  || '0'}`,
     },
     {
       field: 'actions',
@@ -228,13 +228,13 @@ export default function ListEstoque() {
         }
         delete rowEdited['data_recebimento']
 
-        let desconto = rowEdited.desconto
-        if (typeof desconto === 'string' || desconto instanceof String) {
-          desconto = rowEdited.desconto.replace('R', '').replace('$', '').replace(' ', '')
-        }
+        // let desconto = rowEdited.desconto
+        // if (typeof desconto === 'string' || desconto instanceof String) {
+        //   desconto = rowEdited.desconto.replace('R', '').replace('$', '').replace(' ', '')
+        // }
 
-        let response = (await client.put("/api/estoque/" + rowEdited.id, {desconto})).data;
-        console.log(response)
+        // let response = (await client.put("/api/estoque/" + rowEdited.id, {desconto})).data;
+        // console.log(response)
         // response = {
         //   ...response,
         //   data_estoque: moment(estoque.data_estoque?.slice(0, 10)).format("DD-MM-YYYY")
@@ -247,8 +247,8 @@ export default function ListEstoque() {
           />
         );
         // return response;
-        // return rowEdited;
-        return { ...rowEdited, desconto  };
+        return rowEdited;
+        // return { ...rowEdited, desconto  };
 
       } catch (error) {
         toast(
