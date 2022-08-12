@@ -1,17 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 // import PropTypes from 'prop-types';
 
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContentText from '@mui/material/DialogContentText';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import { toast } from 'react-toastify';
 
 
@@ -24,60 +18,16 @@ import {
   TICKET_UPDATE_ERROR,
   TICKET_QUNT_1_ERROR,
   TICKET_QUNT_2_ERROR,
-  PRODUCT_DELETED,
-  TICKET_ERROR,
 } from '../../constants/Messages'
 
-const moment = require('moment')
 
 export default function RowPedido(props) {
   const { rowPedido ,deleteRowAction} = props;
   const [qutdRecebida, setQutdRecebida] = useState(rowPedido.quantidade_recebida);
   const [qutdRecebidaOld, setQutdRecebidaOld] = useState(rowPedido.quantidade_recebida);
-  const [rowCurent, setRowCurent] = useState(rowPedido)
-  const [pedido, setPedido] = useState([])
-  const [openDialogDelete, setOpenDialogDelete] = useState(false)
+  const [rowCurent] = useState(rowPedido)
   const [openEdit, setOpenEdit] = useState(false)
 
-  const handelDeleteRowPedido = (params) => {
-    setOpenDialogDelete(true);
-    setPedido(params)
-  }
-
-  const handleDeleteClose = () => {
-    setOpenDialogDelete(false);
-  };
-
-  const handleConfirmeDelete = async () => {
-    try {
-      let resposta = (await client.delete("/api/pedido/" + pedido.id));
-
-      if (resposta.status === 200) {
-        toast(
-          <Toast
-            type='success'
-            title='Produto'
-            text={PRODUCT_DELETED}
-          />
-        );
-      }
-      else {
-        toast(
-          <Toast
-            type='error'
-            title='Produto'
-            text={TICKET_ERROR}
-          />
-        );
-      }
-      setPedido({});
-      setRowCurent({ ...rowCurent, produto: {} })
-    } catch (error) {
-      console.error(error)
-    }
-    // setRow((r) => r.filter((x) => pedido.id !== x.id));
-    setOpenDialogDelete(false);
-  };
 
   const handelEditRowPedido = async (params) => {
     const a = await processRowUpdate({ quantidade_recebida: parseInt(params.target.value) })
@@ -167,42 +117,14 @@ export default function RowPedido(props) {
           <IconButton
             aria-label="expand row"
             size="small"
+            onClick={deleteRowAction}
           >
             <DeleteIcon
-              onClick={deleteRowAction}
               fontSize='small'
               color='error' />
           </IconButton>
         </TableCell>
       </TableRow>
-      {/* <Dialog
-        open={openDialogDelete}
-        onClose={handleDeleteClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Deseja realmente apagar?"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {`Nota: ${pedido?.nota ?? '-'}`}
-            <br />
-            {`Produto: ${pedido?.produto?.marca || ''} ${pedido?.produto?.modelo || ''} ${pedido?.produto?.capacidade || ''} ${pedido?.produto?.cor || ''} ${pedido?.produto?.ram || ''}`}
-            <br />
-            {`Fornecedor: ${pedido?.fornecedor?.nome ?? '-'}`}
-            <br />
-            {`Data: ${moment(pedido?.data_pedido).format("DD-MM-YYYY") ?? '-'}`}
-            
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteClose}>Cancelar</Button>
-          <Button onClick={handleConfirmeDelete} autoFocus>
-            Confirmar
-          </Button>
-        </DialogActions>
-      </Dialog> */}
     </>
   );
 }

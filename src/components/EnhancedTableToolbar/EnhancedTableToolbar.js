@@ -12,9 +12,9 @@ import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 const EnhancedTableToolbar = (props) => {
   const { numSelected, title , onClickAdd} = props;
 
-  const createSortHandler = (property) => (event) => {
-    onClickAdd(event, property);
-  };
+  // const createSortHandler = (property) => (event) => {
+  //   onClickAdd(event, property);
+  // };
 
   return (
     <Toolbar
@@ -48,11 +48,12 @@ const EnhancedTableToolbar = (props) => {
       )}
 
       <Tooltip title="Filter list">
-        <IconButton>
+        <IconButton
+          onClick={onClickAdd}
+        >
           <AddCircleRoundedIcon 
           fontSize='large' 
           color='info'
-          onClick={onClickAdd}
            />
         </IconButton>
       </Tooltip>

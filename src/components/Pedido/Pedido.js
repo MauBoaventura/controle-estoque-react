@@ -6,7 +6,7 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import EnhancedTable from '../EnhancedTable/EnhancedTable';
-import ListPedidos from './ListPedidos';
+// import ListPedidos from './ListPedidos';
 import EditPedidos from './EditPedidos';
 
 

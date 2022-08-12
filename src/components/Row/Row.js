@@ -13,18 +13,15 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContentText from '@mui/material/DialogContentText';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import EditIcon from '@mui/icons-material/Edit';
 import Collapse from '@mui/material/Collapse';
-import TextField from '@mui/material/TextField';
 import { toast } from 'react-toastify';
 
 import RowPedido from "../RowPedido/RowPedido";
 
 import { client } from "../../services";
-import { formatToReal, formatToDollar } from '../../util/formatCoin'
+import { formatToReal } from '../../util/formatCoin'
 import Toast from "../Toast/Toast";
 
 import {
@@ -90,14 +87,15 @@ export default function Row(props) {
       <TableRow
         hover
         tabIndex={-1}
-        key={row[0]?.name}
+        key={row[0]?.id}
       >
         <TableCell>
           <IconButton
             aria-label="expand row"
             size="small"
+            onClick={() => setOpen(!open)}
           >
-            {open ? <KeyboardArrowDownIcon  onClick={() => setOpen(!open)}/> : <KeyboardArrowRightIcon  onClick={() => setOpen(!open)} />}
+            {open ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon  />}
           </IconButton>
         </TableCell>
         <TableCell
