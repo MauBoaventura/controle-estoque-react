@@ -88,17 +88,14 @@ export default function ListEstoque() {
 
   const columns = [
     {
+      headerName: '',
+      width: 50,
+    },
+    {
       field: 'data_recebimento',
       headerName: 'Data Recebimento',
       type: 'date',
       width: 150,
-    },
-    {
-      field: 'nota',
-      headerName: 'Nota',
-      width: 70,
-      valueGetter: (params) =>
-        `${params.row.pedidos_fornecedor?.nota || ''}`,
     },
     {
       field: 'pedidos_fornecedor_id',
@@ -296,8 +293,6 @@ export default function ListEstoque() {
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
               {`ID: ${pedido?.id ?? '-'}`}
-              <br />
-              {`nota: ${pedido?.nota ?? '-'}`}
               <br />
               {`Fornecedor: ${pedido?.fornecedor?.nome ?? '-'}`}
               <br />
