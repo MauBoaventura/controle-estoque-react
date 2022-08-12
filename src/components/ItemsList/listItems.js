@@ -12,6 +12,7 @@ import LayersIcon from '@mui/icons-material/Layers';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import GroupIcon from '@mui/icons-material/Group';
 import SystemSecurityUpdateGoodIcon from '@mui/icons-material/SystemSecurityUpdateGood';
+import StorefrontIcon from '@mui/icons-material/Storefront';
 
 export const mainListItems = (
   <React.Fragment>
@@ -20,6 +21,12 @@ export const mainListItems = (
         <DashboardIcon />
       </ListItemIcon>
       <ListItemText primary="Pedidos" />
+    </ListItemButton>
+    <ListItemButton href='/vendas'>
+      <ListItemIcon>
+        <StorefrontIcon />
+      </ListItemIcon>
+      <ListItemText primary="Venda" />
     </ListItemButton>
     <ListItemButton href='/produtos'>
       <ListItemIcon>
