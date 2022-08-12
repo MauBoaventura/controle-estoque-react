@@ -10,6 +10,8 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import SettingsCellIcon from '@mui/icons-material/SettingsCell';
 import LayersIcon from '@mui/icons-material/Layers';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import GroupIcon from '@mui/icons-material/Group';
+import SystemSecurityUpdateGoodIcon from '@mui/icons-material/SystemSecurityUpdateGood';
 
 export const mainListItems = (
   <React.Fragment>
@@ -51,9 +53,15 @@ export const mainListItems = (
     </ListItemButton>
     <ListItemButton href='/estoqueresumido'>
       <ListItemIcon>
-        <SettingsCellIcon />
+        <SystemSecurityUpdateGoodIcon />
       </ListItemIcon>
       <ListItemText primary="Estoque Resumido" />
+    </ListItemButton>
+    <ListItemButton href='/clientes'>
+      <ListItemIcon>
+        <GroupIcon />
+      </ListItemIcon>
+      <ListItemText primary="Clientes" />
     </ListItemButton>
   </React.Fragment>
 );

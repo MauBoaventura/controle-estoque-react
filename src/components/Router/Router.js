@@ -11,6 +11,7 @@ import Freteiro from '../../screens/Freteiro/Freteiro';
 import Taxa from '../../screens/Taxa/Taxa';
 import Estoque from '../../screens/Estoque/Estoque.js';
 import EstoqueResumido from '../../screens/EstoqueResumido/EstoqueResumido.js';
+import Clientes from '../../screens/Cliente/Cliente.js';
 
 const Routerr = () => {
 
@@ -30,6 +31,7 @@ const Routerr = () => {
           <Route path='/taxas' element={<Taxa />} />
           <Route path='/estoque' element={<Estoque />} />
           <Route path='/estoqueresumido' element={<EstoqueResumido />} />
+          <Route path='/clientes' element={<Clientes />} />
           <Route path='/login' element={<Login />} />
           <Route path='*' element={<h1>Not Found</h1>} />
         </Routes>
