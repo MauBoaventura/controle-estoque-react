@@ -31,18 +31,6 @@ import {
 import './styles.scss';
 
 const moment = require('moment')
-const isActiveColor = true
-
-const verificaQuantidadeRecebida = (params) => {
-  if (isActiveColor) {
-    if (params.row.quantidade_recebida === params.row.quantidade_solicitada)
-      return 'recebido'
-    else if (params.row.quantidade_recebida > 0)
-      return 'faltando'
-    else
-      return 'nenhum'
-  }
-}
 
 export default function ListEstoque() {
   const history = useNavigate();

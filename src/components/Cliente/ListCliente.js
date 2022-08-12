@@ -1,7 +1,7 @@
-import React, { useEffect, useState , useCallback} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 
-import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -11,7 +11,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 
-import DeleteIcon from '@mui/icons-material/Delete';
 import { toast } from 'react-toastify';
 
 
@@ -22,27 +21,9 @@ import Toast from "../Toast/Toast";
 import {
   TICKET_DELETED, 
   TICKET_ERROR, 
-  TICKET_UPDATE, 
-  TICKET_UPDATE_ERROR, 
-  TICKET_QUNT_1_ERROR, 
-  TICKET_QUNT_2_ERROR,
 } from '../../constants/Messages'
 
 import './styles.scss';
-
-const moment = require('moment')
-const isActiveColor = true
-
-const verificaQuantidadeRecebida = (params) => {
-  if (isActiveColor) {
-    if (params.row.quantidade_recebida === params.row.quantidade_solicitada)
-      return 'recebido'
-    else if (params.row.quantidade_recebida > 0)
-      return 'faltando'
-    else
-      return 'nenhum'
-  }
-}
 
 export default function ListCliente() {
   const history = useNavigate();
@@ -85,11 +66,6 @@ export default function ListCliente() {
     }
     setOpenDialogDevolution(false);
   };
-
-  const handelDeleteRow = (params) => {
-    setEstoqueRow(params.row)
-    setOpenDialogDevolution(true);
-  }
 
   const columns = [
     {
