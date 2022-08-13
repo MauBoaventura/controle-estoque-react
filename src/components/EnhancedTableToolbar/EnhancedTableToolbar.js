@@ -76,7 +76,6 @@ const EnhancedTableToolbar = (props) => {
 };
 
 EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
   onClickAdd: PropTypes.func.isRequired,
 
