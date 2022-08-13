@@ -12,7 +12,7 @@ import LayersIcon from '@mui/icons-material/Layers';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import GroupIcon from '@mui/icons-material/Group';
 import SystemSecurityUpdateGoodIcon from '@mui/icons-material/SystemSecurityUpdateGood';
-import StorefrontIcon from '@mui/icons-material/Storefront';
+import StoreSharpIcon from '@mui/icons-material/StoreSharp';
 
 export const mainListItems = (
   <React.Fragment>
@@ -24,7 +24,7 @@ export const mainListItems = (
     </ListItemButton>
     <ListItemButton href='/vendas'>
       <ListItemIcon>
-        <StorefrontIcon />
+        <StoreSharpIcon />
       </ListItemIcon>
       <ListItemText primary="Venda" />
     </ListItemButton>

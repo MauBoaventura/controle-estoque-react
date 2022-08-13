@@ -1,15 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogActions from '@mui/material/DialogActions';
+// import Dialog from '@mui/material/Dialog';
+// import DialogTitle from '@mui/material/DialogTitle';
+// import DialogContent from '@mui/material/DialogContent';
+// import DialogContentText from '@mui/material/DialogContentText';
+// import DialogActions from '@mui/material/DialogActions';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+// import ButtonBase from '@mui/material/ButtonBase';
+import { styled } from '@mui/material/styles';
+import IconButton from '@mui/material/IconButton';
+
+import LocalMallSharpIcon from '@mui/icons-material/LocalMallSharp';
+import ShoppingCartCheckoutSharpIcon from '@mui/icons-material/ShoppingCartCheckoutSharp';
+
+
 
 import { toast } from 'react-toastify';
 
@@ -19,11 +30,18 @@ import { client } from "../../services";
 import Toast from "../Toast/Toast";
 
 import {
-  TICKET_DELETED, 
-  TICKET_ERROR, 
+  TICKET_DELETED,
+  TICKET_ERROR,
 } from '../../constants/Messages'
 
 import './styles.scss';
+
+const Img = styled('img')({
+  margin: 'auto',
+  display: 'block',
+  maxWidth: '100%',
+  maxHeight: '100%',
+});
 
 export default function ListVenda() {
   const history = useNavigate();
@@ -79,6 +97,32 @@ export default function ListVenda() {
       headerName: 'Nome do Venda',
       // type: 'date',
       width: 200,
+    },
+    {
+      field: 'actions',
+      type: 'actions',
+      width: 80,
+      getActions: (params) => [
+        <GridActionsCellItem
+          icon={<ShoppingCartCheckoutSharpIcon />}
+          label="Delete"
+          onClick={() => {
+            history(`/vendas/${params.row.id}`);
+          }}
+        />,
+        // <GridActionsCellItem
+        //   icon={<SecurityIcon />}
+        //   label="Toggle Admin"
+        //   onClick={() => { }}
+        //   showInMenu
+        // />,
+        // <GridActionsCellItem
+        //   icon={<FileCopyIcon />}
+        //   label="Duplicate User"
+        //   onClick={() => { }}
+        //   showInMenu
+        // />,
+      ],
     },
   ];
 
@@ -214,34 +258,16 @@ export default function ListVenda() {
       </div>
 
       <div className='content'>
-        <Dialog
-          open={openDialogDevolution}
-          onClose={handleDeleteClose}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">
-            {"Deseja realmente apagar?"}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              {`ID: ${clienteRow?.id ?? '-'}`}
-              <br />
-              {`${clienteRow?.pedidos_fornecedor?.produto?.marca || ''} ${clienteRow?.pedidos_fornecedor?.produto?.modelo || ''} ${clienteRow?.pedidos_fornecedor?.produto?.cor || ''} ${clienteRow?.pedidos_fornecedor?.produto?.ram || ''}`} 
-              <br />
-              {`Data: ${clienteRow?.data_recebimento ?? '-'}`}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDeleteClose}>Cancelar</Button>
-            <Button onClick={handleConfirmeDelete} autoFocus>
-              Confirmar
-            </Button>
-          </DialogActions>
-        </Dialog>
         {requesting ? <CircularProgress /> :
-          <div style={{ height: 400, width: '100%' }}>
-            <DataGrid
+          <div style={{
+            height: 400, 
+            width: '100%', 
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-evenly',
+            alignContent: 'flex-start',
+          }}>
+            {/* <DataGrid
               rows={cliente}
               columns={columns}
               pageSize={10}
@@ -251,8 +277,42 @@ export default function ListVenda() {
               // rowHeight={30}
               experimentalFeatures={{ newEditingApi: true }}
               // processRowUpdate={processRowUpdate}
-            />
+            /> */}
+            {cliente.map((item) => {
+              return <Paper
+              elevation={3} 
+                sx={{
+                  p: 2,
+                  marginRight: '20px',
+                  maxWidth: 250,
+                  flexGrow: 1,
+                  backgroundColor: (theme) =>
+                    theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+                }}
+                onClick={() => {
+                  history(`/vendas/${item.id}`);
+                }}
+              >
+                <Grid container spacing={2}>
+                  <Grid item>
+                    <IconButton color="success" >
+                      <LocalMallSharpIcon />
+                    </IconButton>
+                  </Grid>
+                  <Grid item xs={4} sm container>
+                    <Grid item xs container direction="column">
+                      <Grid item xs>
+                        <Typography variant="overline" component="div">
+                          {item.nome}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Paper>
+            })}
           </div>
+
         }
       </div>
     </React.Fragment>
