@@ -256,7 +256,7 @@ export default function ListVenda({id}) {
 
   return (
     <React.Fragment>
-        <EnhancedTableToolbar title={'Pedido'} onClickAdd={() => { history("/vendas/criar") }} />
+        <EnhancedTableToolbar title={'Venda'} onClickAdd={() => { history(`criar`) }} />
 
       <div className='content'>
         <Dialog

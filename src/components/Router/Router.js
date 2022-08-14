@@ -14,6 +14,7 @@ import EstoqueResumido from '../../screens/EstoqueResumido/EstoqueResumido.js';
 import Clientes from '../../screens/Cliente/Cliente.js';
 import Vendas from '../../screens/Vendas/Vendas.js';
 import VendasDetalhes from '../../screens/VendasDetalhes/VendasDetalhes.js';
+import VendaCreate from '../../screens/VendaCreate/VendaCreate.js';
 import LancamentoPreco from '../../screens/LancamentoPreco/LancamentoPreco.js';
 
 const Routerr = () => {
@@ -38,7 +39,7 @@ const Routerr = () => {
           <Route path='/clientes' element={<Clientes />} />
           <Route path='vendas'  >
             <Route path='' element={<Vendas />} />
-            <Route path='criar' element={<PedidoCreate />} />
+            <Route path=':id/criar' element={<VendaCreate />} />
             <Route path=':id' element={<VendasDetalhes />} />
           </Route>
           <Route path='/login' element={<Login />} />
