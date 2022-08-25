@@ -22,7 +22,7 @@ const EstoqueResumido = () => {
             <ThemeProvider theme={mdTheme}>
                   <Box sx={{ display: 'flex' }}>
                         <CssBaseline />
-                        <AppBar title='Estoque Resumido' toggleDrawer={toggleDrawer} drawerWidth={drawerWidth} open={open} />
+                        <AppBar title='Estoque' toggleDrawer={toggleDrawer} drawerWidth={drawerWidth} open={open} />
                         <Drawer toggleDrawer={toggleDrawer} drawerWidth={drawerWidth} open={open} />
                         <EstoqueResumidoContent />
                   </Box>

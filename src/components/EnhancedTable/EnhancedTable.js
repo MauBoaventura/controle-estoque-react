@@ -97,7 +97,7 @@ export default function EnhancedTable(props) {
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
   const [dense,] = useState(true);
-  const [rowsPerPage, setRowsPerPage] = useState(2);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
@@ -175,7 +175,7 @@ export default function EnhancedTable(props) {
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[5, 10, 25, 50]}
           component="div"
           count={rows.length}
           rowsPerPage={rowsPerPage}

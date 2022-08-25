@@ -112,7 +112,10 @@ export default function RowPedido(props) {
         </TableCell>
         <TableCell align="right">{formatToReal(rowCurent.dolar_compra * rowCurent?.taxa_transporte_produto.taxa * rowCurent?.valor_produto * rowCurent?.quantidade_solicitada)}</TableCell>
         <TableCell align="right">{formatToReal(rowCurent?.produto?.valor_transporte)}</TableCell>
-        <TableCell align="right">{formatToReal(rowCurent.dolar_compra * rowCurent?.valor_produto * rowCurent?.quantidade_solicitada - rowCurent?.taxa_transporte_produto.taxa * rowCurent?.valor_produto * rowCurent?.quantidade_solicitada)}</TableCell>
+        <TableCell align="right">
+          {formatToReal(parseInt(rowCurent?.valor_produto * rowCurent.dolar_compra * (rowCurent?.taxa_transporte_produto.taxa) + rowCurent?.produto?.valor_transporte + rowCurent.dolar_compra * rowCurent?.valor_produto))}
+        </TableCell>
+        {/* <TableCell align="right">{formatToReal(rowCurent.dolar_compra * rowCurent?.valor_produto * rowCurent?.quantidade_solicitada - rowCurent?.taxa_transporte_produto.taxa * rowCurent?.valor_produto * rowCurent?.quantidade_solicitada)}</TableCell> */}
         <TableCell align="right" padding='none'>
           <IconButton
             aria-label="expand row"

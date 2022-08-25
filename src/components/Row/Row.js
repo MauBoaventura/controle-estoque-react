@@ -21,11 +21,11 @@ import { toast } from 'react-toastify';
 import RowPedido from "../RowPedido/RowPedido";
 
 import { client } from "../../services";
-import { formatToReal } from '../../util/formatCoin'
+import { formatToReal, formatToDollar } from '../../util/formatCoin'
 import Toast from "../Toast/Toast";
 
 import {
-  TICKET_ERROR, 
+  TICKET_ERROR,
   PRODUCT_DELETED,
 } from '../../constants/Messages'
 
@@ -80,7 +80,10 @@ export default function Row(props) {
     setOpenDialogDelete(false);
   };
 
-  const totalRow = row?.reduce((acc, rowData) => { return acc += row[0]?.dolar_compra * rowData?.valor_produto * rowData?.quantidade_solicitada - rowData?.taxa_transporte_produto.taxa * rowData?.valor_produto * rowData?.quantidade_solicitada }, 0)
+  const totalRow = row?.reduce((acc, rowData) => { return acc += row[0]?.dolar_compra * rowData?.valor_produto * rowData?.quantidade_solicitada }, 0)
+  const totalFrete = row?.reduce((acc, rowData) => { return acc += row[0]?.dolar_compra * rowData?.taxa_transporte_produto.taxa * rowData?.valor_produto * rowData?.quantidade_solicitada }, 0)
+  const totalNota = row?.reduce((acc, rowData) => { return acc += rowData?.valor_produto * rowData?.quantidade_solicitada }, 0)
+  const totalQtdS = row?.reduce((acc, rowData) => { return acc += rowData?.quantidade_solicitada }, 0)
 
   return (
     <>
@@ -95,7 +98,7 @@ export default function Row(props) {
             size="small"
             onClick={() => setOpen(!open)}
           >
-            {open ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon  />}
+            {open ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
           </IconButton>
         </TableCell>
         <TableCell
@@ -110,7 +113,7 @@ export default function Row(props) {
         <TableCell align="left" padding="none">{row[0]?.fornecedor.nome}</TableCell>
         <TableCell align="left" padding="none">{row[0]?.freteiro.nome}</TableCell>
         <TableCell align="right" padding="none">{formatToReal(row[0]?.dolar_compra)}</TableCell>
-        <TableCell align="right" padding="none">{formatToReal(totalRow)}</TableCell>
+        <TableCell align="right" padding="none" style={{ fontWeight: "bold" }}>{`${formatToReal(totalRow)}`}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
@@ -122,17 +125,27 @@ export default function Row(props) {
                     <TableCell>Produto</TableCell>
                     <TableCell>Qtd. solicitada</TableCell>
                     <TableCell>Qtd. recebida</TableCell>
-                    <TableCell>Valor unitário ($)</TableCell>
+                    <TableCell>Preço da unidade ($)</TableCell>
                     <TableCell align="right">Frete (R$)</TableCell>
                     <TableCell align="right">Transporte (R$)</TableCell>
-                    <TableCell align="right">Total (R$)</TableCell>
+                    <TableCell>Valor unitário</TableCell>
+                    {/* <TableCell align="right">Total (R$)</TableCell> */}
                     <TableCell></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {row?.map((historyRow) => (
-                    <RowPedido key={historyRow?.id} rowPedido={historyRow} deleteRowAction={()=>handelDeleteRow(historyRow)}/>
+                    <RowPedido key={historyRow?.id} rowPedido={historyRow} deleteRowAction={() => handelDeleteRow(historyRow)} />
                   ))}
+                  <TableRow >
+                    <TableCell style={{ fontWeight: "bold" }}>Total</TableCell>
+                    <TableCell style={{ fontWeight: "bold" }}>{totalQtdS}</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell style={{ fontWeight: "bold" }}>V.N.: {formatToDollar(totalNota)}</TableCell>
+                    <TableCell style={{ fontWeight: "bold" }}>{formatToReal(totalFrete)}</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>-</TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
             </Box>
@@ -157,7 +170,7 @@ export default function Row(props) {
             {`Fornecedor: ${pedido?.fornecedor?.nome ?? '-'}`}
             <br />
             {`Data: ${moment(pedido?.data_pedido).format("DD-MM-YYYY") ?? '-'}`}
-            
+
           </DialogContentText>
         </DialogContent>
         <DialogActions>

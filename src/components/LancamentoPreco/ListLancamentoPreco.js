@@ -105,14 +105,16 @@ export default function ListEstoque() {
       headerName: 'Produto',
       width: 260,
       valueGetter: (params) =>
-        `${params.row.pedidos_fornecedor.produto?.marca || ''} ${params.row.pedidos_fornecedor.produto?.modelo || ''} ${params.row.pedidos_fornecedor.produto?.cor || ''} ${params.row.pedidos_fornecedor.produto?.ram || ''}`,
+      `${params.row.pedidos_fornecedor.produto?.marca || ''} ${params.row.pedidos_fornecedor.produto?.modelo || ''} ${params.row.pedidos_fornecedor.produto?.capacidade || ''} ${params.row.pedidos_fornecedor.produto?.cor || ''} ${params.row.pedidos_fornecedor.produto?.ram || ''}`,
+      // `${params.row.pedidos_fornecedor.produto?.marca || ''} ${params.row.pedidos_fornecedor.produto?.modelo || ''} ${params.row.pedidos_fornecedor.produto?.cor || ''} ${params.row.pedidos_fornecedor.produto?.ram || ''}`,
     },
     {
       field: 'valor_produto',
       headerName: 'Preço Compra',
       width: '120',
       valueGetter: (params) =>
-        `R$ ${(params.row.pedidos_fornecedor.valor_produto * params.row.pedidos_fornecedor.dolar_compra).toFixed(2) || ''}`,
+      `R$ ${(params.row.pedidos_fornecedor.valor_produto * params.row.pedidos_fornecedor.dolar_compra * params.row.pedidos_fornecedor.taxa_transporte_produto.taxa + params.row.pedidos_fornecedor.produto.valor_transporte + params.row.pedidos_fornecedor.valor_produto * params.row.pedidos_fornecedor.dolar_compra).toFixed(2) || ''}`
+      // `R$ ${(params.row.pedidos_fornecedor.valor_produto * params.row.pedidos_fornecedor.dolar_compra).toFixed(2) || ''}`,
     },
     {
       field: 'valor_venda',

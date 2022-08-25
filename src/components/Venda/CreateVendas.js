@@ -13,9 +13,7 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 
 import Button from '@mui/material/Button';
-import Menu from '@mui/material/Menu';
 import InputAdornment from '@mui/material/InputAdornment';
-import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Divider from '@mui/material/Divider';
@@ -43,26 +41,26 @@ export default
   function CreatePedidos() {
   const { id } = useParams();
   const history = useNavigate();
-  const [freteiros, setFreteiros] = useState([])
-  const [fornecedores, setFornecedores] = useState([])
+  const [opt, setOpt] = useState([])
   const [produtos, setProdutos] = useState([])
   const [listProdutos, setListProdutos] = useState([])
 
   const [requesting, setRequesting] = useState(false);
   const [initialValues, setInitialValues] = useState({
     "data_pedido": new Date().toJSON().slice(0, 10),
-    "taxa": 0,
+    "opt": [],
     "produtos": [],
   });
 
   const validationSchema = Yup.object().shape({
-    nota: Yup.string().required(REQUIRED_FIELD)
+    // nota: Yup.string().required(REQUIRED_FIELD)
   });
 
   const onSubmit = async (formValues) => {
+    console.log(formValues)
     try {
       setRequesting(true)
-      if (true) {
+      if (false) {
         delete formValues['taxa']
         let vendas = (await client.post("/api/pedido/", formValues));
 
@@ -109,37 +107,22 @@ export default
 
   useEffect(() => {
     async function loadAll() {
-      //Carrega lista de freteiro
-      try {
-        let lastpedido = (await client.get("/api/lastpedido"));
-        lastpedido = lastpedido.data
-        setInitialValues({ ...initialValues, 'nota': lastpedido + 1 });
-      } catch (error) {
-        console.error(error)
-      }
-
-      //Carrega lista de freteiro
-      try {
-        let freteiros = (await client.get("/api/freteiro/"));
-        freteiros = freteiros.data.map((item, i) => ({ label: item.nome, id: item.id }))
-        setFreteiros(freteiros);
-      } catch (error) {
-        console.error(error)
-      }
-
-      //Carrega lista de fornecedores
-      try {
-        let fornecedores = (await client.get("/api/fornecedor/"));
-        fornecedores = fornecedores.data.map((item, i) => ({ label: item.nome, id: item.id }))
-        setFornecedores(fornecedores);
-      } catch (error) {
-        console.error(error)
-      }
 
       //Carrega lista de produtos
       try {
-        let produtos = (await client.get("/api/produto/"));
-        produtos = produtos.data.map((item) => ({ label: `${item.marca || ''} ${item.modelo || ''} ${item.cor || ''} ${item.ram || ''}`, id: item.id }))
+        let produtos = (await client.get("/api/estoque?group=true&by_nota=true"));
+        produtos = produtos.data
+        produtos = produtos.map((item => {
+          return {
+            ...item,
+            produto_id: item.pedidos_fornecedor.produto.id,
+            label: `${item.pedidos_fornecedor.produto.marca || ''} ${item.pedidos_fornecedor.produto.modelo || ''} ${item.pedidos_fornecedor.produto.cor || ''} ${item.pedidos_fornecedor.produto.ram || ''}`,
+            data_recebimento: moment(item.data_recebimento?.slice(0, 10)).format("DD-MM-YYYY"),
+            opt: Array.from({ length: item.total_produtos_em_estoque }, (_, i) => i + 1)
+
+          }
+        }))
+        console.log(produtos)
         setProdutos(produtos);
       } catch (error) {
         console.error(error)
@@ -152,21 +135,17 @@ export default
 
   useEffect(() => {
     async function load() {
-      formik.values.produtos.map(async (produto, index) => {
-        if (produto.produto_id && produto.freteiro_id) {
-          try {
-            let taxa = (await client.get(`/api/taxa/?freteiro_id=${produto.freteiro_id}&produto_id=${produto.produto_id}`));
-            if (taxa.status === 200) {
-              taxa = taxa.data.taxa
-              formik.setFieldValue(`produtos.${index}.taxa`, (taxa * 100).toFixed(2), true)
-            } else {
-              formik.setFieldValue(`produtos.${index}.taxa`, (5).toFixed(2), true)
-            }
-          } catch (error) {
-            formik.setFieldValue(`produtos.${index}.taxa`, 0, true)
-          }
-        }
-      })
+      // console.log(formik.values)
+      // formik.values.produtos.map(async (produto, index) => {
+      //   if (produto.produto_id) {
+      //     try {
+      //       formik.setFieldValue(`produtos.${index}.quantidade`, produtos[produto.id].opt, true)
+      //       setOpt(produtos[produto.id].opt)
+      //     } catch (error) {
+      //       formik.setFieldValue(`produtos.${index}.quantidade`, 0, true)
+      //     }
+      //   }
+      // })
     }
     if (formik.values.produtos.length !== 0)
       load()
@@ -222,7 +201,7 @@ export default
             <Grid item xs={12}>
               <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                 <div>
-                <EnhancedTableToolbar title={'Venda'} onClickAdd={() => { history(`/`) }} />
+                  <EnhancedTableToolbar title={'Venda'} onClickAdd={() => { history(`/`) }} />
                 </div>
                 <form className='form' onSubmit={formik.handleSubmit}>
                   <div className='form-row'>
@@ -252,87 +231,8 @@ export default
                         />
                       )}
                     />
-                    <TextField
-                      id='nota'
-                      name='nota'
-                      label="Nota"
-                      variant='outlined'
-
-                      autoComplete='on'
-                      className='margin-l'
-                      onChange={formik.handleChange}
-                      value={formik.values.nota}
-                      error={!!formik.errors.nota && formik.touched.nota}
-                      helperText={formik.touched.nota && formik.errors.nota}
-                      disabled={requesting}
-                      type="number"
-                      margin='dense'
-                      sx={{ minWidth: 200 }}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      InputProps={{
-                        inputProps: { min: 0 }
-                      }}
-                    />
-
                   </div>
-                  <div className='form-row'>
-                    <Autocomplete
-                      disablePortal
-                      id='fornecedor_id'
-                      name='fornecedor_id'
-                      options={fornecedores}
-                      sx={{ minWidth: 200 }}
-                      onChange={(e, value) => {
-                        console.log(value);
-                        formik.setFieldValue(
-                          "fornecedor_id",
-                          value !== null ? value.id : initialValues.fornecedor_id
-                        );
-                      }}
-                      renderInput={(params) =>
-                        <TextField {...params}
-                          margin='dense'
-                          label="Fornecedor"
-                          variant='outlined'
 
-                          autoComplete='on'
-                          className='form-field'
-                          onChange={(e, value) => formik.setFieldValue("fornecedor_id", value)}
-                          value={formik.values.fornecedor_id}
-                          error={!!formik.errors.fornecedor_id && formik.touched.fornecedor_id}
-                          helperText={formik.touched.fornecedor_id && formik.errors.fornecedor_id}
-                          disabled={requesting}
-                          sx={{ minWidth: 200 }}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                        />}
-                    />
-                  </div>
-                  <div className='form-row'>
-                    <TextField
-                      id='dolar_compra'
-                      name='dolar_compra'
-                      label="Dólar compra"
-                      variant='outlined'
-
-                      autoComplete='on'
-                      className='form-field'
-                      onChange={formik.handleChange}
-                      value={formik.values.dolar_compra}
-                      error={!!formik.errors.dolar_compra && formik.touched.dolar_compra}
-                      helperText={formik.touched.dolar_compra && formik.errors.dolar_compra}
-                      disabled={requesting}
-                      type="number"
-                      margin='dense'
-                      sx={{ minWidth: 200 }}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    />
-                  </div>
                   <Typography gutterBottom variant="h6" component="div" marginTop={1}>
                     Produto
                     <IconButton color="success" onClick={addProduto}>
@@ -355,6 +255,10 @@ export default
                                 `produtos.${index}.produto_id`,
                                 value !== null ? value.id : initialValues.produto_id
                               );
+                              setOpt((v=[])=>{
+                                v.splice(index, 0, value?.opt);
+                                return v; 
+                              });
                             }}
                             renderInput={(params) =>
                               <TextField {...params}
@@ -374,50 +278,32 @@ export default
                                 }}
                               />}
                           />
-                          <TextField
-                            className='margin-l'
-                            id={`produtos.${index}.valor_produto`}
-                            name={`produtos.${index}.valor_produto`}
-                            label="Valor unitário"
-                            variant='outlined'
-                            autoComplete='on'
-                            onChange={formik.handleChange}
-                            value={formik.values.valor_produto}
-                            error={!!formik.errors.valor_produto && formik.touched.valor_produto}
-                            helperText={formik.touched.valor_produto && formik.errors.valor_produto}
-                            disabled={requesting}
-                            type="number"
-                            margin='dense'
-                            sx={{ minWidth: 200 }}
-                            InputLabelProps={{
-                              shrink: true,
-                            }}
-                          />
                           <Autocomplete
                             className='margin-l'
                             disablePortal
-                            id={`produtos.${index}.freteiro_id`}
-                            name={`produtos.${index}.freteiro_id`}
-                            options={freteiros}
+                            id={`produtos.${index}.quantidade`}
+                            name={`produtos.${index}.quantidade`}
+                            options={opt[index]??['loading...']}
                             sx={{ minWidth: 200 }}
                             onChange={(e, value) => {
                               console.log(value);
+                              console.log(value > 0 ? value : initialValues.quantidade);
                               formik.setFieldValue(
-                                `produtos.${index}.freteiro_id`,
-                                value !== null ? value.id : initialValues.freteiro_id
+                                `produtos.${index}.quantidade`,
+                                value > 0 ? value : initialValues.quantidade
                               );
                             }}
                             renderInput={(params) =>
                               <TextField {...params}
                                 margin='dense'
-                                label="Freteiro"
+                                label="Quantidade"
                                 variant='outlined'
                                 autoComplete='on'
                                 className='form-field'
-                                onChange={(e, value) => formik.setFieldValue(`produtos.${index}.freteiro_id`, value)}
-                                value={formik.values.freteiro_id}
-                                error={!!formik.errors.freteiro_id && formik.touched.freteiro_id}
-                                helperText={formik.touched.freteiro_id && formik.errors.freteiro_id}
+                                onChange={(e, value) => formik.setFieldValue(`produtos.${index}.quantidade`, value)}
+                                value={formik.values.quantidade}
+                                error={!!formik.errors.quantidade && formik.touched.quantidade}
+                                helperText={formik.touched.quantidade && formik.errors.quantidade}
                                 disabled={requesting}
                                 sx={{ minWidth: 200 }}
                                 InputLabelProps={{
@@ -427,24 +313,21 @@ export default
                           />
                           <TextField
                             className='margin-l'
-                            id={`produtos.${index}.quantidade_solicitada`}
-                            name={`produtos.${index}.quantidade_solicitada`}
-                            label="Quantidade solicitada"
+                            id={`produtos.${index}.desconto`}
+                            name={`produtos.${index}.desconto`}
+                            label="Desconto"
                             variant='outlined'
                             autoComplete='on'
                             onChange={formik.handleChange}
-                            value={formik.values.quantidade_solicitada}
-                            error={!!formik.errors.quantidade_solicitada && formik.touched.quantidade_solicitada}
-                            helperText={formik.touched.quantidade_solicitada && formik.errors.quantidade_solicitada}
+                            value={formik.values.desconto}
+                            error={!!formik.errors.desconto && formik.touched.desconto}
+                            helperText={formik.touched.desconto && formik.errors.desconto}
                             disabled={requesting}
                             type="number"
                             margin='dense'
                             sx={{ minWidth: 200 }}
                             InputLabelProps={{
                               shrink: true,
-                            }}
-                            InputProps={{
-                              inputProps: { min: 0 }
                             }}
                           />
                           <TextField
