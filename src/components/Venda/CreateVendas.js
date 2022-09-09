@@ -1,5 +1,5 @@
 /*eslint-disable */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { parseISO } from 'date-fns';
 import { toast } from 'react-toastify';
@@ -12,6 +12,7 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
@@ -20,7 +21,12 @@ import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import EnhancedTableToolbar from '../EnhancedTableToolbar/EnhancedTableToolbar';
 
@@ -34,9 +40,20 @@ import {
   TICKET_ERROR,
   REQUIRED_FIELD,
 } from '../../constants/Messages';
+import { Input, Stack } from '@mui/material';
+import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 
 const moment = require('moment')
 
+function isEmpty(obj) {
+  for (var prop in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+      return false;
+    }
+  }
+
+  return JSON.stringify(obj) === JSON.stringify({});
+}
 export default
   function CreatePedidos() {
   const { id } = useParams();
@@ -44,13 +61,14 @@ export default
   const [opt, setOpt] = useState([])
   const [produtos, setProdutos] = useState([])
   const [listProdutos, setListProdutos] = useState([])
+  const [codBarra, setCodBarra] = useState([])
+  const [estoqueRow, setEstoqueRow] = useState({})
+  const [openDialogDevolution, setOpenDialogDevolution] = useState(false)
 
   const [requesting, setRequesting] = useState(false);
-  const [initialValues, setInitialValues] = useState({
-    "data_pedido": new Date().toJSON().slice(0, 10),
-    "opt": [],
-    "produtos": [],
-  });
+  const initialValues = {
+    "data_pedido": new Date().toJSON().slice(0, 10)
+  }
 
   const validationSchema = Yup.object().shape({
     // nota: Yup.string().required(REQUIRED_FIELD)
@@ -58,6 +76,7 @@ export default
 
   const onSubmit = async (formValues) => {
     console.log(formValues)
+    console.log(listProdutos)
     try {
       setRequesting(true)
       if (false) {
@@ -98,6 +117,26 @@ export default
       setRequesting(false)
     }
   };
+
+  const pesquisaApaga = async (e) => {
+    if (e.key === "Enter") {
+      let dado = (await client.get(`/api/vendabycod?cod=${e.target.value}`));
+      if (isEmpty(dado.data)) {
+        toast(
+          <Toast
+            type='error'
+            title='Produto'
+            text={'Produto não consta em estoque'}
+          />
+        );
+        setCodBarra('');
+        return;
+      }
+      setCodBarra('');
+      handleAddRow(dado.data)
+    }
+  }
+
   const formik = useFormik({
     initialValues,
     validationSchema,
@@ -110,47 +149,61 @@ export default
 
       //Carrega lista de produtos
       try {
-        let produtos = (await client.get("/api/estoque?group=true&by_nota=true"));
-        produtos = produtos.data
-        produtos = produtos.map((item => {
-          return {
-            ...item,
-            produto_id: item.pedidos_fornecedor.produto.id,
-            label: `${item.pedidos_fornecedor.produto.marca || ''} ${item.pedidos_fornecedor.produto.modelo || ''} ${item.pedidos_fornecedor.produto.cor || ''} ${item.pedidos_fornecedor.produto.ram || ''}`,
-            data_recebimento: moment(item.data_recebimento?.slice(0, 10)).format("DD-MM-YYYY"),
-            opt: Array.from({ length: item.total_produtos_em_estoque }, (_, i) => i + 1)
-
-          }
-        }))
-        console.log(produtos)
-        setProdutos(produtos);
+        await client.put("/api/estoquelimpaconsulta");
       } catch (error) {
         console.error(error)
       }
-
-      setListProdutos([0])
     }
     loadAll()
   }, [])
 
-  useEffect(() => {
-    async function load() {
-      // console.log(formik.values)
-      // formik.values.produtos.map(async (produto, index) => {
-      //   if (produto.produto_id) {
-      //     try {
-      //       formik.setFieldValue(`produtos.${index}.quantidade`, produtos[produto.id].opt, true)
-      //       setOpt(produtos[produto.id].opt)
-      //     } catch (error) {
-      //       formik.setFieldValue(`produtos.${index}.quantidade`, 0, true)
-      //     }
-      //   }
-      // })
-    }
-    if (formik.values.produtos.length !== 0)
-      load()
-  }, [...formik.values.produtos])
-
+  const columns = [
+    {
+      field: 'Produto',
+      headerName: 'Produto',
+      sortable: false,
+      width: 260,
+      valueGetter: (params) =>
+        `${params.row.label}`,
+    },
+    {
+      field: 'valor_venda',
+      headerName: 'Valor Venda',
+      sortable: false,
+      width: 260,
+      valueGetter: (params) =>
+        `${params.row.valor_venda}`,
+    }, {
+      field: 'desconto',
+      headerName: 'Desconto',
+      sortable: false,
+      editable: true,
+      type: 'number',
+      width: 260,
+      valueGetter: (params) =>
+        `${params.row.desconto}`,
+    },
+    {
+      field: 'valor_final',
+      headerName: 'Total',
+      sortable: false,
+      width: 260,
+      valueGetter: (params) =>
+        `${params.row.valor_venda - params.row.desconto}`,
+    },
+    {
+      field: 'actions',
+      type: 'actions',
+      width: 80,
+      getActions: (params) => [
+        <GridActionsCellItem
+          icon={<DeleteIcon />}
+          label="Delete"
+          onClick={() => { handelDeleteRow(params) }}
+        />,
+      ],
+    },
+  ];
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -177,9 +230,103 @@ export default
     formik.validateForm();
   }, []);
 
-  const addProduto = () => {
-    setListProdutos([...listProdutos, 2]);
+  const handleAddRow = (product) => {
+    setListProdutos([...listProdutos, {
+      ...product,
+      label: `${product.pedidos_fornecedor.produto.marca || ''} ${product.pedidos_fornecedor.produto.modelo || ''} ${product.pedidos_fornecedor.produto.cor || ''} ${product.pedidos_fornecedor.produto.ram || ''}`,
+      desconto: 0
+    }]);
   }
+
+  const processRowUpdate = useCallback(
+    async (rowEdited, rowOldValues) => {
+      try {
+        if (rowEdited.desconto < 0) {
+          toast(
+            <Toast
+              type='error'
+              title='Desconto'
+              text={'Desconto negativo'}
+            />
+          );
+          return rowOldValues;
+        }
+        if (rowEdited.desconto > rowEdited.valor_venda) {
+          toast(
+            <Toast
+              type='error'
+              title='Desconto'
+              text={'Desconto maior que o valor do produto'}
+            />
+          );
+          return rowOldValues;
+        }
+        setListProdutos((produtos) => {
+          return produtos.map(produto => {
+            console.log(produto)
+            console.log(rowEdited.id)
+            if (produto.id === rowEdited.id) {
+              return { ...produto, desconto: rowEdited.desconto }
+            }
+            return produto
+          })
+      });
+        return rowEdited;
+
+      } catch (error) {
+        toast(
+          <Toast
+            type='error'
+            title='Pedido'
+            // text={TICKET_UPDATE_ERROR}
+          />
+        );
+      }
+
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  // Dialog 
+  const handleDeleteClose = () => {
+    setOpenDialogDevolution(false);
+  };
+
+  const handelDeleteRow = (params) => {
+    setEstoqueRow(params.row)
+    setOpenDialogDevolution(true);
+  }
+
+  const handleConfirmeDelete = async () => {
+    try {
+      let resposta = (await client.put("/api/estoque/" + estoqueRow.id, { status_consulta: false }));
+
+      if (resposta.status === 200) {
+        toast(
+          <Toast
+            type='success'
+            title='Produto'
+            text={`Produto removido da venda`}
+          />
+        );
+      }
+      else {
+        toast(
+          <Toast
+            type='error'
+            title='Produto'
+            text={`Ocorreu um erro`}
+          />
+        );
+      }
+      setListProdutos((r) => r.filter((x) => estoqueRow.id !== x.id));
+      setEstoqueRow({});
+    } catch (error) {
+      console.error(error)
+    }
+    setOpenDialogDevolution(false);
+  };
   return (
     <React.Fragment>
       <Box
@@ -235,129 +382,28 @@ export default
 
                   <Typography gutterBottom variant="h6" component="div" marginTop={1}>
                     Produto
-                    <IconButton color="success" onClick={addProduto}>
-                      <AddShoppingCartIcon />
-                    </IconButton>
                   </Typography>
                   <Divider />
-                  {
-                    listProdutos.map((item, index) => (
-                      <>
-                        <div className='form-row'>
-                          <Autocomplete
-                            id={`produtos.${index}.produto_id`}
-                            name={`produtos.${index}.produto_id`}
-                            options={produtos}
-                            sx={{ minWidth: 200 }}
-                            onChange={(e, value) => {
-                              console.log(value);
-                              formik.setFieldValue(
-                                `produtos.${index}.produto_id`,
-                                value !== null ? value.id : initialValues.produto_id
-                              );
-                              setOpt((v=[])=>{
-                                v.splice(index, 0, value?.opt);
-                                return v; 
-                              });
-                            }}
-                            renderInput={(params) =>
-                              <TextField {...params}
-                                margin='dense'
-                                label="Produto"
-                                variant='outlined'
-                                autoComplete='on'
-                                className='form-field'
-                                onChange={(e, value) => formik.setFieldValue(`produtos.${index}.produto_id`, value)}
-                                value={formik.values.produto_id}
-                                error={!!formik.errors.produto_id && formik.touched.produto_id}
-                                helperText={formik.touched.produto_id && formik.errors.produto_id}
-                                disabled={requesting}
-                                sx={{ minWidth: 200 }}
-                                InputLabelProps={{
-                                  shrink: true,
-                                }}
-                              />}
-                          />
-                          <Autocomplete
-                            className='margin-l'
-                            disablePortal
-                            id={`produtos.${index}.quantidade`}
-                            name={`produtos.${index}.quantidade`}
-                            options={opt[index]??['loading...']}
-                            sx={{ minWidth: 200 }}
-                            onChange={(e, value) => {
-                              console.log(value);
-                              console.log(value > 0 ? value : initialValues.quantidade);
-                              formik.setFieldValue(
-                                `produtos.${index}.quantidade`,
-                                value > 0 ? value : initialValues.quantidade
-                              );
-                            }}
-                            renderInput={(params) =>
-                              <TextField {...params}
-                                margin='dense'
-                                label="Quantidade"
-                                variant='outlined'
-                                autoComplete='on'
-                                className='form-field'
-                                onChange={(e, value) => formik.setFieldValue(`produtos.${index}.quantidade`, value)}
-                                value={formik.values.quantidade}
-                                error={!!formik.errors.quantidade && formik.touched.quantidade}
-                                helperText={formik.touched.quantidade && formik.errors.quantidade}
-                                disabled={requesting}
-                                sx={{ minWidth: 200 }}
-                                InputLabelProps={{
-                                  shrink: true,
-                                }}
-                              />}
-                          />
-                          <TextField
-                            className='margin-l'
-                            id={`produtos.${index}.desconto`}
-                            name={`produtos.${index}.desconto`}
-                            label="Desconto"
-                            variant='outlined'
-                            autoComplete='on'
-                            onChange={formik.handleChange}
-                            value={formik.values.desconto}
-                            error={!!formik.errors.desconto && formik.touched.desconto}
-                            helperText={formik.touched.desconto && formik.errors.desconto}
-                            disabled={requesting}
-                            type="number"
-                            margin='dense'
-                            sx={{ minWidth: 200 }}
-                            InputLabelProps={{
-                              shrink: true,
-                            }}
-                          />
-                          <TextField
-                            className='margin-l'
-                            id={`produtos.${index}.taxa`}
-                            name={`produtos.${index}.taxa`}
-                            label="Taxa"
-                            variant='outlined'
-                            autoComplete='on'
-                            value={formik.values.produtos[index]?.taxa}
-                            disabled={true}
-                            type="number"
-                            margin='dense'
-                            sx={{ minWidth: 200 }}
-                            InputLabelProps={{
-                              shrink: true,
-                            }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="start">%</InputAdornment>
-                              ),
-                              inputProps: { min: 0 }
-                            }}
-                          />
-                        </div>
-                        <Divider />
-                      </>
-
-                    ))
-                  }
+                  <Box sx={{ width: '100%', marginTop: 1 }}>
+                    <Input value={codBarra} placeholder='Código de barra' onChange={(value) => setCodBarra(value.target.value)} onKeyDown={pesquisaApaga}></Input>
+                    <Stack direction="row" spacing={2}>
+                      <Button size="small" onClick={pesquisaApaga}>
+                        Pesquisar
+                      </Button>
+                    </Stack>
+                    <Box sx={{ height: 400, mt: 1 }}>
+                      <DataGrid
+                        rows={listProdutos}
+                        columns={columns}
+                        pageSize={100}
+                        disableMultipleSelection={true}
+                        disableSelectionOnClick
+                        // rowHeight={30}
+                        experimentalFeatures={{ newEditingApi: true }}
+                        processRowUpdate={processRowUpdate}
+                      />
+                    </Box>
+                  </Box>
                   <div className='form-row'>
                     <Button className='margin-t' variant="contained" color="success" type='submit'>
                       Salvar
@@ -369,7 +415,30 @@ export default
           </Grid>
         </Container>
       </Box>
-
+      <Dialog
+          open={openDialogDevolution}
+          onClose={handleDeleteClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Deseja realmente apagar?"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              {`ID: ${estoqueRow?.id ?? '-'}`}
+              <br />
+              {`${estoqueRow?.pedidos_fornecedor?.produto?.marca || ''} ${estoqueRow?.pedidos_fornecedor?.produto?.modelo || ''} ${estoqueRow?.pedidos_fornecedor?.produto?.cor || ''} ${estoqueRow?.pedidos_fornecedor?.produto?.ram || ''}`} 
+              <br />
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDeleteClose}>Cancelar</Button>
+            <Button onClick={handleConfirmeDelete} autoFocus>
+              Confirmar
+            </Button>
+          </DialogActions>
+        </Dialog>
     </React.Fragment>
   );
 }
