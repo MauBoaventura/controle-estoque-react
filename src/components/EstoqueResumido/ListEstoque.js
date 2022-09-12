@@ -78,12 +78,12 @@ export default function ListEstoque() {
       headerName: '',
       width: 50,
     },
-    {
-      field: 'data_recebimento',
-      headerName: 'Data Recebimento',
-      type: 'date',
-      width: 150,
-    },
+    // {
+    //   field: 'data_recebimento',
+    //   headerName: 'Data Recebimento',
+    //   type: 'date',
+    //   width: 150,
+    // },
     {
       field: 'pedidos_fornecedor_id',
       headerName: 'ID pedido',
@@ -95,29 +95,29 @@ export default function ListEstoque() {
     {
       field: 'Produto',
       headerName: 'Produto',
-      width: 260,
+      width: 360,
       valueGetter: (params) =>
         `${params.row.pedidos_fornecedor.produto?.marca || ''} ${params.row.pedidos_fornecedor.produto?.modelo || ''} ${params.row.pedidos_fornecedor.produto?.capacidade || ''} ${params.row.pedidos_fornecedor.produto?.cor || ''} ${params.row.pedidos_fornecedor.produto?.ram || ''}`,
     },
-    {
-      field: 'valor_produto',
-      headerName: 'Preço Compra',
-      width: '120',
-      valueGetter: (params) =>{
-        // console.log(params.row);
-        return `R$ ${(params.row.pedidos_fornecedor.valor_produto * params.row.pedidos_fornecedor.dolar_compra * params.row.pedidos_fornecedor.taxa_transporte_produto.taxa + params.row.pedidos_fornecedor.produto.valor_transporte + params.row.pedidos_fornecedor.valor_produto * params.row.pedidos_fornecedor.dolar_compra).toFixed(2) || ''}`
-      }
-    },
-    {
-      field: 'valor_venda',
-      headerName: 'Preço Venda',
-      type:'number',
-      width: 120,
-      editable: true,
-      valueGetter: (params) =>
-        // params.row?.valor_venda?.length <= 3 ? `R$ ${params.row.valor_venda || '0'}` : `${params.row.valor_venda || 'R$ 0'}`,
-        `R$ ${params.row.valor_venda || '0'}`,
-    },
+    // {
+    //   field: 'valor_produto',
+    //   headerName: 'Preço Compra',
+    //   width: '120',
+    //   valueGetter: (params) =>{
+    //     // console.log(params.row);
+    //     return `R$ ${(params.row.pedidos_fornecedor.valor_produto * params.row.pedidos_fornecedor.dolar_compra * params.row.pedidos_fornecedor.taxa_transporte_produto.taxa + params.row.pedidos_fornecedor.produto.valor_transporte + params.row.pedidos_fornecedor.valor_produto * params.row.pedidos_fornecedor.dolar_compra).toFixed(2) || ''}`
+    //   }
+    // },
+    // {
+    //   field: 'valor_venda',
+    //   headerName: 'Preço Venda',
+    //   type:'number',
+    //   width: 120,
+    //   editable: true,
+    //   valueGetter: (params) =>
+    //     // params.row?.valor_venda?.length <= 3 ? `R$ ${params.row.valor_venda || '0'}` : `${params.row.valor_venda || 'R$ 0'}`,
+    //     `R$ ${params.row.valor_venda || '0'}`,
+    // },
     {
       field: 'total_produtos_em_estoque',
       headerName: 'Total em estoque',
