@@ -74,53 +74,54 @@ export default
     // nota: Yup.string().required(REQUIRED_FIELD)
   });
 
-  const onSubmit = async (formValues) => {
-    console.log(formValues)
-    console.log(listProdutos)
-    try {
-      setRequesting(true)
-      if (false) {
-        delete formValues['taxa']
-        let vendas = (await client.post("/api/pedido/", formValues));
+  const onSubmit = async (formValues, a) => {
+    if (!codBarra.length)
 
-        if (vendas.status === 201) {
-          toast(
-            <Toast
-              type='success'
-              title='Pedido'
-              text={TICKET_CREATED}
-            />
-          );
-          history("/vendas");
+      try {
+        setRequesting(true)
+
+        if (true) {
+          // delete formValues['taxa']
+          let vendas = (await client.post("/api/venda/", { ...formValues, produtos: listProdutos, cliente_final_id: id }));
+
+          if (vendas.status === 201) {
+            toast(
+              <Toast
+                type='success'
+                title='Venda '
+                text={TICKET_CREATED}
+              />
+            );
+            history(`/vendas/${id}`);
+          }
+          else {
+            toast(
+              <Toast
+                type='error'
+                title='Pedido'
+                text={TICKET_ERROR}
+              />
+            );
+            // history("/vendas");
+          }
         }
-        else {
-          toast(
-            <Toast
-              type='error'
-              title='Pedido'
-              text={TICKET_ERROR}
-            />
-          );
-          history("/vendas");
-        }
+      } catch (error) {
+        toast(
+          <Toast
+            type='error'
+            title='Pedido'
+            text={TICKET_ERROR}
+          />
+        );
       }
-    } catch (error) {
-      toast(
-        <Toast
-          type='error'
-          title='Pedido'
-          text={TICKET_ERROR}
-        />
-      );
-    }
-    finally {
-      setRequesting(false)
-    }
+      finally {
+        setRequesting(false)
+      }
   };
 
-  const pesquisaApaga = async (e) => {
-    if (e.key === "Enter") {
-      let dado = (await client.get(`/api/vendabycod?cod=${e.target.value}`));
+  const pesquisaApaga = async (e, pesquiva = false) => {
+    if (e.key === "Enter" || pesquiva) {
+      let dado = (await client.get(`/api/vendabycod?cod=${codBarra}`));
       if (isEmpty(dado.data)) {
         toast(
           <Toast
@@ -134,6 +135,7 @@ export default
       }
       setCodBarra('');
       handleAddRow(dado.data)
+      e.preventDefault();
     }
   }
 
@@ -270,7 +272,7 @@ export default
             }
             return produto
           })
-      });
+        });
         return rowEdited;
 
       } catch (error) {
@@ -278,7 +280,7 @@ export default
           <Toast
             type='error'
             title='Pedido'
-            // text={TICKET_UPDATE_ERROR}
+          // text={TICKET_UPDATE_ERROR}
           />
         );
       }
@@ -350,7 +352,7 @@ export default
                 <div>
                   <EnhancedTableToolbar title={'Venda'} onClickAdd={() => { history(`/`) }} />
                 </div>
-                <form className='form' onSubmit={formik.handleSubmit}>
+                <form className='form' onSubmit={(e) => { e.preventDefault(); formik.handleSubmit(e) }} >
                   <div className='form-row'>
                     <DatePicker
                       id='data_pedido'
@@ -385,9 +387,12 @@ export default
                   </Typography>
                   <Divider />
                   <Box sx={{ width: '100%', marginTop: 1 }}>
-                    <Input value={codBarra} placeholder='Código de barra' onChange={(value) => setCodBarra(value.target.value)} onKeyDown={pesquisaApaga}></Input>
+                    <Input value={codBarra} placeholder='Código de barra' onChange={(value) => setCodBarra(value.target.value)} onKeyDown={(e) => { pesquisaApaga(e); }}></Input>
                     <Stack direction="row" spacing={2}>
-                      <Button size="small" onClick={pesquisaApaga}>
+                      <Button size="small" type='button' onClick={(e) => {
+                        pesquisaApaga(e, true)
+                        e.preventDefault()
+                      }}>
                         Pesquisar
                       </Button>
                     </Stack>
@@ -416,29 +421,29 @@ export default
         </Container>
       </Box>
       <Dialog
-          open={openDialogDevolution}
-          onClose={handleDeleteClose}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">
-            {"Deseja realmente apagar?"}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              {`ID: ${estoqueRow?.id ?? '-'}`}
-              <br />
-              {`${estoqueRow?.pedidos_fornecedor?.produto?.marca || ''} ${estoqueRow?.pedidos_fornecedor?.produto?.modelo || ''} ${estoqueRow?.pedidos_fornecedor?.produto?.cor || ''} ${estoqueRow?.pedidos_fornecedor?.produto?.ram || ''}`} 
-              <br />
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDeleteClose}>Cancelar</Button>
-            <Button onClick={handleConfirmeDelete} autoFocus>
-              Confirmar
-            </Button>
-          </DialogActions>
-        </Dialog>
+        open={openDialogDevolution}
+        onClose={handleDeleteClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Deseja realmente apagar?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {`ID: ${estoqueRow?.id ?? '-'}`}
+            <br />
+            {`${estoqueRow?.pedidos_fornecedor?.produto?.marca || ''} ${estoqueRow?.pedidos_fornecedor?.produto?.modelo || ''} ${estoqueRow?.pedidos_fornecedor?.produto?.cor || ''} ${estoqueRow?.pedidos_fornecedor?.produto?.ram || ''}`}
+            <br />
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteClose}>Cancelar</Button>
+          <Button onClick={handleConfirmeDelete} autoFocus>
+            Confirmar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </React.Fragment>
   );
 }
