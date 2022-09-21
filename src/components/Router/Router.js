@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';// import { obse
 import Login from '../../screens/Login/Login';
 import Home from '../../screens/Home/Home';
 import Produto from '../../screens/Produto/Produto';
+import ProdutoCreate from '../../screens/ProdutoCreate/ProdutoCreate';
 import Pedido from '../../screens/Pedido/Pedido';
 import PedidoCreate from '../../screens/PedidoCreate/PedidoCreate';
 import Fornecedor from '../../screens/Fornecedor/Fornecedor';
@@ -24,11 +25,15 @@ const Routerr = () => {
       <div className='App'>
         <Routes>
           <Route path='/' element={<Home />} />
-          <Route path='/produtos' element={<Produto />} />
           <Route path='pedidos'  >
             <Route path='' element={<Pedido />} />
             <Route path='criar' element={<PedidoCreate />} />
             <Route path=':id/editar' element={<Pedido />} />
+          </Route>
+          <Route path='produtos'  >
+            <Route path='' element={<Produto />} />
+            <Route path='criar' element={<ProdutoCreate />} />
+            <Route path=':id/editar' element={<Produto />} />
           </Route>
           <Route path='/fornecedores' element={<Fornecedor />} />
           <Route path='/freteiros' element={<Freteiro />} />
